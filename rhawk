@@ -1,0 +1,109 @@
+#!awk -f
+
+@include "irc.awk"
+@include "spades.awk"
+
+# Initialization
+BEGIN {
+	OWNER = "andy753421"
+	connect("localhost", "rhawk", "#rhtest");
+}
+
+# Admin
+FROM == OWNER && TO == NICK && /^die in a fire/ {
+	say("Ack, argh, barasdjf..")
+	quit()
+}
+
+FROM == OWNER && TO == NICK && /^reload/ {
+	say("Reloading..")
+	reload()
+}
+
+FROM == OWNER && TO == NICK && /^rejoin/ {
+	reply("joining..")
+	join("#rhnoise")
+	next
+}
+
+FROM == OWNER && TO == NICK && /^(join|part)/ {
+	match(MSG, /(join|part) +(#+\w+)/, arr)
+	if (arr[1] && arr[2]) {
+		send(toupper(arr[1]) " " arr[2]);
+		next
+	}
+}
+
+FROM == OWNER && TO == NICK && /^\.msg/ {
+	match(MSG, /.*\.msg +(#*\w+) +(.*)/, arr)
+	send("PRIVMSG " arr[1] " :" arr[2])
+}
+
+# Kick handling
+CMD == "KICK" {
+	kick_delay = (kick_delay + 2) * 2
+	system("sleep " kick_delay)
+	join(DST)
+	reply("I feel happy!")
+}
+
+# Identify bots
+FROM ~ /bo+t$|rhnoise/ {
+	bots[FROM] = 1
+}
+
+CMD == "NICK" && FROM in bots {
+	bots[MSG] = FROM
+}
+
+
+# Unicode
+/[Uu]nicode :-?\(/ {
+	plain[FROM] = 1
+}
+
+/[Uu]nicode :-?\)/ {
+	plain[FROM] = 0
+}
+
+# Fortune
+TO == NICK && /^/             { extra = ""   }
+TO == NICK && /^.fortune.*-o/ { extra = "-o" }
+TO == NICK && /^.fortune/     {
+	gsub(/.*\.fortune *|-[a-z]* *|[^a-zA-Z0-9 ]/, "", MSG)
+	cmd = "fortune " extra " " (MSG ? "-m '" MSG "'" : "-s")
+	while (cmd | getline _fortune && lines < 5) {
+		say(_fortune)
+		lines++
+	}
+	close(cmd)
+	next
+}
+
+# Noise
+FROM ~ OWNER && /^go go gadget woop/ {
+	for (i=20; i>0; i--)
+		say(".delay " i " seconds; .woop " i)
+}
+
+TO == NICK && DST ~ /^#/ {
+	#say("Hello, " FROM)
+}
+
+!(FROM in bots) &&
+MSG !~ /^\./ &&
+/\<awk\>/ {
+	say("Awk, awk, awk! I'm a bird!")
+}
+
+/^\.help/ {
+	reply("Nothing can help you now..")
+}
+
+/Ho.*Ho.*Ho/ {
+	say("\00309Merry \00304Christmas!")
+}
+
+{ fflush("") }
+
+# vim: ft=awk

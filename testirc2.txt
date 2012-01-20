@@ -1,0 +1,40 @@
+:andy!a@c.d PRIVMSG #rhnoise :test
+:andy!a@c.d PRIVMSG #rhnoise :unicode :)
+:andy!a@c.d PRIVMSG #rhnoise :test
+:andy!a@c.d PRIVMSG #rhnoise :unicode :(
+:andy!a@c.d PRIVMSG #rhnoise :test
+
+:andy!a@c.d PRIVMSG #rhnoise :#.help
+:andy!a@c.d PRIVMSG #rhnoise :#.help spades
+
+:andy!a@c.d PRIVMSG #rhnoise :#.join
+:andy!a@c.d PRIVMSG #rhnoise :#.newgame 123
+:andy!a@c.d PRIVMSG #rhnoise :#.newgame
+:andy!a@c.d PRIVMSG #rhnoise :# .newgame   123  
+
+:a!a@c.d PRIVMSG #rhnoise :#.join
+:a!a@c.d PRIVMSG #rhnoise :#.join
+:b!a@c.d PRIVMSG #rhnoise :#.join
+:c!a@c.d PRIVMSG #rhnoise :#.join
+:d!a@c.d PRIVMSG #rhnoise :#.join
+
+:a!a@c.d PRIVMSG #rhnoise :#.look
+
+:a!a@c.d PRIVMSG #rhnoise :#.bid 1
+:b!a@c.d PRIVMSG #rhnoise :#.bid 2
+:c!a@c.d PRIVMSG #rhnoise :#.bid 3
+:d!a@c.d PRIVMSG #rhnoise :#.bid 4
+
+:a!a@c.d PRIVMSG #rhnoise :#.play Ah
+:b!a@c.d PRIVMSG #rhnoise :#.play Kh
+:c!a@c.d PRIVMSG #rhnoise :#.play Qh
+:d!a@c.d PRIVMSG #rhnoise :#.play 5s
+:d!a@c.d PRIVMSG #rhnoise :#.play Ad
+
+:a!a@c.d PRIVMSG #rhnoise :#.play 9d
+:b!a@c.d PRIVMSG #rhnoise :##.play 4c
+:b!a@c.d PRIVMSG #rhnoise :#.play 9s
+:c!a@c.d PRIVMSG #rhnoise :#.play 6d
+:d!a@c.d PRIVMSG #rhnoise :#.play 7d
+
+:a!a@c.d PRIVMSG #rhnoise :#.play 5s

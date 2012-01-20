@@ -1,0 +1,5 @@
+:andy753421!~a@c.d PRIVMSG #rhnoise :spades
+:andy753421!~a@c.d PRIVMSG #rhnoise :unicode :)
+:andy753421!~a@c.d PRIVMSG #rhnoise :spades
+:andy753421!~a@c.d PRIVMSG #rhnoise :unicode :(
+:andy753421!~a@c.d PRIVMSG #rhnoise :spades
