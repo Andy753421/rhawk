@@ -1,7 +1,3 @@
-# Todo:
-#   - highest bidder leads
-#   - show card after play
-
 # Functions
 function sp_init(cards, tmp0, tmp1)
 {
@@ -149,7 +145,7 @@ function sp_score(	bids, tricks)
 		bids   = sp_bids[i]   + sp_bids[i+2]
 		tricks = sp_tricks[i] + sp_tricks[i+2]
 		bags   = tricks - bids
-		if (sp_bags(i) + bags > 10) {
+		if (sp_bags(i) + bags >= 10) {
 			say(sp_team(i) " bag out")
 			sp_scores[i] -= 100
 		}
@@ -456,6 +452,7 @@ sp_state == "play" &&
 	    sp_order[3] " took " int(sp_tricks[3]) "/" int(sp_bids[3]))
 }
 
+(TO == NICK || DST == sp_channel) &&
 /^\.(score|status)$/ {
 	if (sp_state == "new") {
 		say("There is no game in progress")

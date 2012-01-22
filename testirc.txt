@@ -1,5 +1,2 @@
-:andy753421!~a@c.d PRIVMSG #rhnoise :spades
-:andy753421!~a@c.d PRIVMSG #rhnoise :unicode :)
-:andy753421!~a@c.d PRIVMSG #rhnoise :spades
-:andy753421!~a@c.d PRIVMSG #rhnoise :unicode :(
-:andy753421!~a@c.d PRIVMSG #rhnoise :spades
+:andy753421!~a@c.d TOPIC #sfvlug :San Fernando Valley Linux Users Group | Meeting: Sat January 21, 6:00pm Denny's Van Nuys | Website: www.sfvlug.org & Wiki: http://tinyurl.com/tabrr & Meetup: http://meetup.com/sfvlug | Knowledge is power. http://tinyurl.com/2xr7sd
+:andy753421!~a@c.d PRIVMSG #sfvlug :.poll

@@ -19,15 +19,15 @@
 
 # Debugging
 function send(msg) {
-	#print "  > " msg > "/dev/stderr"
+	print "  > " msg > "/dev/stderr"
 	print msg
-	#system("sleep 1")
+	system("sleep 1")
 	fflush()
 }
 
 // {
 	#print ""         > "/dev/stderr"
-	#print "  < " $0  > "/dev/stderr"
+	print "  < " $0  > "/dev/stderr"
 }
 
 function debug(msg) {
@@ -74,10 +74,15 @@ function reply(msg) {
 
 function join(chan) {
 	send("JOIN " chan)
+	send("TOPIC " chan)
 }
 
 function part(chan) {
 	send("PART " chan)
+}
+
+function topic(chan, msg) {
+	send("TOPIC " chan " :" msg)
 }
 
 # Reloading
@@ -130,4 +135,9 @@ CMD == "001" && MSG ~ /Welcome/ {
 
 CMD == "PING" {
 	send("PING " MSG)
+}
+
+CMD == "332" ||
+CMD == "TOPIC" {
+	topics[DST] = MSG
 }
