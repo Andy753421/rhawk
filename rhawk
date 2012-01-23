@@ -40,7 +40,7 @@ FROM == OWNER && TO == NICK && /^\.msg/ {
 }
 
 # Kick handling
-CMD == "KICK" {
+CMD == "KICK" && ARG == NICK {
 	kick_delay = (kick_delay + 2) * 2
 	system("sleep " kick_delay)
 	join(DST)
@@ -67,25 +67,26 @@ CMD == "NICK" && FROM in bots {
 }
 
 # SFV Lug
-(systime()-lastpoll > 60*60*24 && CMD == "PING") ||
-(/^\.poll/ && DST == "#sfvlug" && CMD == "PRIVMSG") {
-	chan = "#sfvlug"
-	if (!topics[chan])
-		next
-	lastpoll = systime()
-	cmd = "curl -s http://sfvlug.org/"
-	day = "(Sun|Mon|Tue|Wed|Thu|Fri|Sat)"
-	web = "next meeting.*" day "\\w+[, ]+([A-Z]\\w+) +([0-9]+)[, ]+([0-9]+)"
-	irc = day "\\w*[, ]+([A-Z]\\w+) +([0-9]+)"
-	while (cmd | getline line) {
-		if (match(line, web, arr)) {
-			new = arr[1] " " arr[2] " " arr[3]
-			sub(irc, new, topics[chan])
-			topic(topics[chan])
-			next
-		}
-	}
-}
+#pollchan = "#sfvlug"
+#(CMD == "PING"    && systime()-lastpoll > 60*60*24) ||
+#(CMD == "PRIVMSG" && DST == pollchan && /^\.poll/) {
+#	if (!topics[pollchan])
+#		next
+#	cmd = "curl -s http://sfvlug.org/"
+#	day = "(Sun|Mon|Tue|Wed|Thu|Fri|Sat)"
+#	web = "next meeting.*" day "\\w+[, ]+([A-Z]\\w+) +([0-9]+)[, ]+([0-9]+)"
+#	irc = day "\\w*[, ]+([A-Z]\\w+) +([0-9]+)"
+#	while (cmd | getline line) {
+#		if (match(line, web, arr)) {
+#			new = arr[1] " " arr[2] " " arr[3]
+#			sub(irc, new, topics[pollchan])
+#			topic(pollchan, topics[pollchan])
+#			break
+#		}
+#	}
+#	lastpoll = systime()
+#	close(cmd)
+#}
 
 
 # Fortune

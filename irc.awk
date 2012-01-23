@@ -41,6 +41,7 @@ function set() {
 	debug("DST:  " DST)
 	debug("FROM: " FROM)
 	debug("TO:   " TO)
+	debug("ARG:  " ARG)
 	debug("MSG:  " MSG)
 }
 
@@ -108,14 +109,15 @@ function reload() {
 
 # Input parsing
 // {
-	match($0, /(:([^ ]+) +)?(([A-Z0-9]+) +)(([^ ]+) +)?([^:]*:(.*))/, arr);
+	match($0, /(:([^ ]+) +)?(([A-Z0-9]+) +)(([^ ]+) +)?(([^: ]+) +)?(:(.*))/, arr);
 	gsub(/\s+/,     " ", arr[8])
 	gsub(/^ | $/,    "", arr[8])
 	gsub(/\3[0-9]*/, "", arr[8])
 	SRC = arr[2]
 	CMD = arr[4]
 	DST = arr[6]
-	MSG = arr[8]
+	ARG = arr[8]
+	MSG = arr[10]
 
 	match(SRC, /([^! ]+)!/, arr);
 	FROM = arr[1]
@@ -137,7 +139,11 @@ CMD == "PING" {
 	send("PING " MSG)
 }
 
-CMD == "332" ||
+CMD == "332" {
+	CMD = "TOPIC"
+	DST = ARG
+}
+
 CMD == "TOPIC" {
 	topics[DST] = MSG
 }
