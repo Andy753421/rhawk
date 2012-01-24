@@ -1,2 +1,5 @@
 *~
 *.swp
+*.so
+*.o
+config.h
