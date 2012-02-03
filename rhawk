@@ -67,27 +67,28 @@ CMD == "NICK" && FROM in bots {
 }
 
 # SFV Lug
-#pollchan = "#sfvlug"
-#(CMD == "PING"    && systime()-lastpoll > 60*60*24) ||
-#(CMD == "PRIVMSG" && DST == pollchan && /^\.poll/) {
-#	if (!topics[pollchan])
-#		next
-#	cmd = "curl -s http://sfvlug.org/"
-#	day = "(Sun|Mon|Tue|Wed|Thu|Fri|Sat)"
-#	web = "next meeting.*" day "\\w+[, ]+([A-Z]\\w+) +([0-9]+)[, ]+([0-9]+)"
-#	irc = day "\\w*[, ]+([A-Z]\\w+) +([0-9]+)"
-#	while (cmd | getline line) {
-#		if (match(line, web, arr)) {
-#			new = arr[1] " " arr[2] " " arr[3]
-#			sub(irc, new, topics[pollchan])
-#			topic(pollchan, topics[pollchan])
-#			break
-#		}
-#	}
-#	lastpoll = systime()
-#	close(cmd)
-#}
-
+BEGIN { pollchan = "#sfvlug" }
+(CMD == "PING"    && systime()-lastpoll > 60*60*24) ||
+(CMD == "PRIVMSG" && DST == pollchan && /^\.poll/) {
+	if (!topics[pollchan]) {
+		debug("Unknown topic for " pollchan);
+		next
+	}
+	cmd = "curl -s http://sfvlug.org/"
+	day = "(Sun|Mon|Tue|Wed|Thu|Fri|Sat)"
+	web = "next meeting.*" day "\\w+[, ]+([A-Z]\\w+) +([0-9]+)[, ]+([0-9]+)"
+	irc = day "\\w*[, ]+([A-Z]\\w+) +([0-9]+)"
+	while (cmd | getline line) {
+		if (match(line, web, arr)) {
+			new = arr[1] " " arr[2] " " arr[3]
+			sub(irc, new, topics[pollchan])
+			topic(pollchan, topics[pollchan])
+			break
+		}
+	}
+	lastpoll = systime()
+	close(cmd)
+}
 
 # Fortune
 TO == NICK && /^/             { extra = ""   }

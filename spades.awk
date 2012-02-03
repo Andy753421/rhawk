@@ -315,7 +315,7 @@ FROM == OWNER &&
 
 !sp_valid &&
 (sp_state "bid" || sp_state == "play") &&
-/^\.(bid|play)\>$/ {
+/^\.(bid|play)\>/ {
 	if (FROM in sp_players)
 		say(".slap " FROM ", it is not your turn.")
 	else
@@ -458,7 +458,7 @@ sp_state == "play" &&
 		say("There is no game in progress")
 	}
 	if (sp_state == "join") {
-		say("Waiting for palyers: " \
+		say("Waiting for players: " \
 		    sp_order[0] " " sp_order[1] " " \
 		    sp_order[2] " " sp_order[3])
 	}
