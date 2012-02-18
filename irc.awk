@@ -36,13 +36,14 @@ function debug(msg) {
 }
 
 function set() {
-	debug("CMD:  " CMD)
-	debug("SRC:  " SRC)
-	debug("DST:  " DST)
-	debug("FROM: " FROM)
-	debug("TO:   " TO)
-	debug("ARG:  " ARG)
-	debug("MSG:  " MSG)
+	debug("CMD:  [" CMD  "]")
+	debug("SRC:  [" SRC  "]")
+	debug("DST:  [" DST  "]")
+	debug("FROM: [" FROM "]")
+	debug("TO:   [" TO   "]")
+	debug("ARG:  [" ARG  "]")
+	debug("MSG:  [" MSG  "]")
+	debug("$0:   [" $0   "]")
 }
 
 # Functions
@@ -109,10 +110,10 @@ function reload() {
 
 # Input parsing
 // {
+	gsub(/\s+/,     " ")
+	gsub(/^ | $/,    "")
+	gsub(/\3[0-9]*/, "")
 	match($0, /(:([^ ]+) +)?(([A-Z0-9]+) +)(([^ ]+) +)?(([^: ]+) +)?(:(.*))/, arr);
-	gsub(/\s+/,     " ", arr[8])
-	gsub(/^ | $/,    "", arr[8])
-	gsub(/\3[0-9]*/, "", arr[8])
 	SRC = arr[2]
 	CMD = arr[4]
 	DST = arr[6]
@@ -128,6 +129,8 @@ function reload() {
 
 	if (CMD == "PRIVMSG" && DST == NICK && FROM)
 		TO = DST
+
+	set()
 }
 
 # IRC client

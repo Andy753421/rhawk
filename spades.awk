@@ -270,7 +270,7 @@ FROM == OWNER &&
 
 
 # Setup
-/^\.newgame ?([0-9]+)?$/ {
+/^\.newgame ?([0-9]+)?/ {
 	if (sp_state != "new") {
 		reply("There is already a game in progress.")
 	} else {

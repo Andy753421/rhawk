@@ -116,7 +116,7 @@ TO == NICK && DST ~ /^#/ {
 
 !(FROM in bots) &&
 MSG !~ /^\./ &&
-/\<awk\>/ {
+/awk/ {
 	say("Awk, awk, awk! I'm a bird!")
 }
 
