@@ -91,10 +91,10 @@ BEGIN { pollchan = "#sfvlug" }
 }
 
 # Fortune
-TO == NICK && /^/             { extra = ""   }
-TO == NICK && /^.fortune.*-o/ { extra = "-o" }
-TO == NICK && /^.fortune/     {
-	gsub(/.*\.fortune *|-[a-z]* *|[^a-zA-Z0-9 ]/, "", MSG)
+TO == NICK && /^/                 { extra = ""   }
+TO == NICK && /^\.?fortune.*-o/ { extra = "-o" }
+TO == NICK && /^\.?fortune/     {
+	gsub(/.*\.?fortune *|-[a-z]* *|[^a-zA-Z0-9 ]/, "", MSG)
 	cmd = "fortune " extra " " (MSG ? "-m '" MSG "'" : "-s")
 	while (cmd | getline _fortune && lines < 5) {
 		say(_fortune)
