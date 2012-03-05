@@ -7,6 +7,9 @@
 BEGIN {
 	OWNER = "andy753421"
 	connect("localhost", "rhawk", "#rhtest");
+	join("#rhnoise")
+	join("#rhspades")
+	join("#sfvlug")
 }
 
 # Admin
