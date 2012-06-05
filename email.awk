@@ -76,9 +76,12 @@ FROM ~ OWNER &&
 	delete mail_enable[FROM]
 }
 
-TO in mail_enable {
-	mail_ready[TO][DST] = systime()
-	debug("queing messages to " DST " for " TO)
+DST ~ /^#.*/ {
+	for (_user in mail_enable)
+		if ($0 ~ "\\<"_user"\\>") {
+			mail_ready[_user][DST] = systime()
+			debug("queing messages to " DST " for " _user)
+		}
 }
 
 FROM in mail_enable {
@@ -91,7 +94,7 @@ DST ~ /^#.*/ {
 	_i = length(mail_log[DST][_t])
 	if (_i==0) delete mail_log[DST][_t]
 	mail_log[DST][_t][_i] = DST " " strftime("(%H:%M:%S) ") FROM ": " $0
-	debug("log["DST"]["_t"]["_i"] = "mail_log[DST][_t][_i])
+	#debug("log["DST"]["_t"]["_i"] = "mail_log[DST][_t][_i])
 }
 
 // {
