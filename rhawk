@@ -114,6 +114,17 @@ FROM ~ OWNER && /^go go gadget woop/ {
 		say(".delay " i " seconds; .woop " i)
 }
 
+TO == NICK && /^[Ww][Oo]+[Pp]/ {
+	gsub(/[^Oo]/, "", $1)
+	_len = length($1)
+	if (_len == 2)
+		_len = 10
+	_woop = "WOOP"
+	for (i=1; i<_len; i++)
+		_woop = _woop " WOOP"
+	say(_woop)
+}
+
 TO == NICK && DST ~ /^#/ {
 	#say("Hello, " FROM)
 }
