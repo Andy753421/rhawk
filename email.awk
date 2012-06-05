@@ -4,8 +4,8 @@ BEGIN {
 	mail_delay = 60 # Wait 60 seconds after last mention before mailing
 
 	mail_from  = NICK "<andy753421@gmail.com>"
-	mail_err   = "If you recieved this message in error,\n" \
-	             "someone in #rhnoise is begin a jerk"
+	mail_err   = "If you received this message in error,\n" \
+	             "someone in #rhnoise is being a jerk"
 }
 
 function mail_send(addr, subj, body,
@@ -80,7 +80,7 @@ DST ~ /^#.*/ {
 	for (_user in mail_enable)
 		if ($0 ~ "\\<"_user"\\>") {
 			mail_ready[_user][DST] = systime()
-			debug("queing messages to " DST " for " _user)
+			debug("queueing messages to " DST " for " _user)
 		}
 }
 
