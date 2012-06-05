@@ -130,7 +130,7 @@ function reload() {
 	if (CMD == "PRIVMSG" && DST == NICK && FROM)
 		TO = DST
 
-	set()
+	#set()
 }
 
 # IRC client

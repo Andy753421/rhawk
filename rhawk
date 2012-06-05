@@ -124,7 +124,8 @@ MSG !~ /^\./ &&
 	say("Awk, awk, awk! I'm a bird!")
 }
 
-/^\.(help|halp)/ {
+!(FROM in bots) &&
+/^[^.](help|halp)/ {
 	reply("Nothing can help you now..")
 }
 
