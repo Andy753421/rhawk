@@ -70,20 +70,41 @@ function mail_run(  user, chan, ready, time)
 }
 
 FROM ~ OWNER &&
+TO == NICK &&
 /^e?mail .* .*/ {
 	reply("notifying " $2 " for " $3)
 	mail_enable[$3] = $2
 }
 
+TO == NICK &&
 /^e?mail  *[^ ]*$/ {
-	reply("notifying " $2 " for " FROM)
-	mail_enable[FROM] = $2
+	_user = FROM
+	_addr = $2
+	gsub(/[^a-zA-Z0-9_+@.-]/, "", _user)
+	gsub(/[^a-zA-Z0-9_+@.-]/, "", _addr)
+	reply("notifying " _addr " for " _user)
+	mail_enable[_user] = _addr
 }
 
+FROM ~ OWNER &&
+TO == NICK &&
+/^stfu .*/ {
+	reply("well fine then")
+	delete mail_enable[$2]
+	delete mail_ready[$2]
+}
+
+TO == NICK &&
 /^stfu$/ {
 	reply("well fine then")
 	delete mail_enable[FROM]
 	delete mail_ready[FROM]
+}
+
+TO == NICK &&
+/^who/ {
+	for (_user in mail_enable)
+		reply("\"" _user "\" <" mail_enable[_user] ">")
 }
 
 DST ~ /^#.*/ {
