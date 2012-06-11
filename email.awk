@@ -44,7 +44,7 @@ function mail_prep(user, chan,
 			}
 		}
 	}
-	say("notifying " user " at " addr)
+	privmsg(chan, "notifying " user " at " addr)
 	mail_send(addr, "Message for " user " in " chan, body)
 	delete mail_ready[user][chan]
 }
@@ -74,6 +74,7 @@ FROM ~ OWNER &&
 /^stfu$/ {
 	reply("well fine then")
 	delete mail_enable[FROM]
+	delete mail_ready[FROM]
 }
 
 DST ~ /^#.*/ {
