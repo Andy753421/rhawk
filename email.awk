@@ -1,3 +1,9 @@
+@include "json.awk"
+
+# Save email addresses
+BEGIN { json_load("var/mail.txt", mail_enable) }
+END   { json_save("var/mail.txt", mail_enable) }
+
 # Email notifications
 BEGIN {
 	mail_hist  = 60 # Send 60 seconds of backlog
@@ -6,6 +12,9 @@ BEGIN {
 	mail_from  = NICK "<andy753421@gmail.com>"
 	mail_err   = "If you received this message in error,\n" \
 	             "someone in #rhnoise is being a jerk"
+
+	for (_user in mail_enable) 
+		debug("watching " mail_enable[_user] " for " _user)
 }
 
 function mail_send(addr, subj, body,
@@ -67,7 +76,7 @@ FROM ~ OWNER &&
 }
 
 /^e?mail  *[^ ]*$/ {
-	reply("notifying " $2)
+	reply("notifying " $2 " for " FROM)
 	mail_enable[FROM] = $2
 }
 
