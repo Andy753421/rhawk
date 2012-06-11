@@ -6,12 +6,13 @@ END   { json_save("var/mail.txt", mail_enable) }
 
 # Email notifications
 BEGIN {
-	mail_hist  = 60 # Send 60 seconds of backlog
-	mail_delay = 60 # Wait 60 seconds after last mention before mailing
+	mail_hist   = 2*60 # If the users has not spoken withn mail_before before 
+	mail_before = 2*60 # someone mentions their name and does not reply within
+	mail_after  = 2*60 # mail_after seconds, email them hist seconds of the backlog
 
-	mail_from  = NICK "<andy753421@gmail.com>"
-	mail_err   = "If you received this message in error,\n" \
-	             "someone in #rhnoise is being a jerk"
+	mail_from   = NICK "<andy753421@gmail.com>"
+	mail_err    = "If you received this message in error,\n" \
+	              "someone in #rhnoise is being a jerk"
 
 	for (_user in mail_enable) 
 		debug("watching " mail_enable[_user] " for " _user)
@@ -64,7 +65,7 @@ function mail_run(  user, chan, ready, time)
 	for (chan in mail_ready[user]) {
 		ready = mail_ready[user][chan]
 		delay = systime() - ready
-		if (ready && delay > mail_delay)
+		if (ready && delay > mail_after)
 			mail_prep(user, chan)
 	}
 }
@@ -92,6 +93,7 @@ TO == NICK &&
 	reply("well fine then")
 	delete mail_enable[$2]
 	delete mail_ready[$2]
+	delete mail_seen[$2]
 }
 
 TO == NICK &&
@@ -99,6 +101,7 @@ TO == NICK &&
 	reply("well fine then")
 	delete mail_enable[FROM]
 	delete mail_ready[FROM]
+	delete mail_seen[FROM]
 }
 
 TO == NICK &&
@@ -108,15 +111,18 @@ TO == NICK &&
 }
 
 DST ~ /^#.*/ {
-	for (_user in mail_enable)
-		if ($0 ~ "\\<"_user"\\>") {
+	for (_user in mail_enable) {
+		_idle = systime() - mail_seen[_user]
+		if ($0 ~ "\\<"_user"\\>" && _idle > mail_before) {
 			mail_ready[_user][DST] = systime()
 			debug("queueing messages to " DST " for " _user)
 		}
+	}
 }
 
 FROM in mail_enable {
 	delete mail_ready[FROM]
+	mail_seen[FROM] = systime()
 	debug("clearing message for " FROM)
 }
 
