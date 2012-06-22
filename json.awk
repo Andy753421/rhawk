@@ -260,7 +260,7 @@ function json_load(file, var,   line, text, tokens, data, key)
 
 function json_save(file, var,   cmd, tmp)
 {
-	cmd = "mktemp ." file ".XXX"
+	cmd = "mktemp " file ".XXX"
 	cmd | getline tmp
 	close(cmd)
 	print json_write_value(var) > tmp
