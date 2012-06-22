@@ -54,7 +54,7 @@ function mail_prep(user, chan,
 			}
 		}
 	}
-	privmsg(chan, "notifying " user " at " addr)
+	say(chan, "notifying " user " at " addr)
 	mail_send(addr, "Message for " user " in " chan, body)
 	delete mail_ready[user][chan]
 }

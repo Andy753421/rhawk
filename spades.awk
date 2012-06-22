@@ -265,7 +265,7 @@ FROM == OWNER &&
 	delete sp_hands[$2]
 	for (i=3; i<=NF; i++)
 		sp_hands[$2][$i] = 1
-	privmsg(sp_channel, FROM " is cheating for " $2)
+	say(sp_channel, FROM " is cheating for " $2)
 }
 
 
@@ -279,7 +279,7 @@ FROM == OWNER &&
 		sp_state   = "join"
 		sp_channel = DST
 		say(sp_owner " starts a game of Spades to " sp_playto "!")
-		#privmsg("#rhnoise", sp_owner " starts a game of Spades in " DST "!")
+		#say("#rhnoise", sp_owner " starts a game of Spades in " DST "!")
 	}
 }
 
@@ -341,7 +341,7 @@ sp_state == "bid" &&
 			say("Bidding goes to " sp_player "!")
 		} else {
 			for (p in sp_players)
-				privmsg(p, "You have: " sp_hand(p))
+				say(p, "You have: " sp_hand(p))
 			sp_state = "play"
 			for (i=0; i<2; i++) {
 				if (sp_nil[i] == 2 || sp_nil[i+2] == 2) {
@@ -377,7 +377,7 @@ sp_state == "pass" &&
 	}
 	else {
 		sp_pass[sp_players[FROM]] = $2
-		privmsg(sp_channel, FROM " passes a card")
+		say(sp_channel, FROM " passes a card")
 	}
 	if (((sp_nil[0] != 2 && sp_nil[2] != 2) || (sp_pass[0] && sp_pass[2])) &&
 	    ((sp_nil[1] != 2 && sp_nil[3] != 2) || (sp_pass[1] && sp_pass[3]))) {
@@ -387,9 +387,9 @@ sp_state == "pass" &&
 			delete sp_hands[sp_order[i]][card]
 			sp_hands[sp_order[partner]][card] = 1
 		}
-		privmsg(sp_channel, "Cards have been passed, play starts with " sp_player "!")
+		say(sp_channel, "Cards have been passed, play starts with " sp_player "!")
 		for (p in sp_players)
-			privmsg(p, "You have: " sp_hand(p))
+			say(p, "You have: " sp_hand(p))
 		sp_state = "play"
 	}
 }
@@ -400,7 +400,7 @@ sp_state ~ "(play|bid)" &&
 		say(".slap " FROM ", you are not playing.")
 	} else {
 		sp_looked[sp_players[FROM]] = 1
-		privmsg(FROM, "You have: " sp_hand(FROM))
+		say(FROM, "You have: " sp_hand(FROM))
 	}
 }
 
@@ -425,7 +425,7 @@ sp_state == "play" &&
 	}
 	else {
 		sp_play(card)
-		privmsg(FROM, "You have: " sp_hand(FROM))
+		say(FROM, "You have: " sp_hand(FROM))
 		if (sp_state == "play") {
 			if (sp_piles)
 				say(sp_player ": it is your turn! " \

@@ -58,16 +58,26 @@ function connect(server, nick, channel) {
 		send("NICK " nick)
 	}
 }
-function privmsg(to, msg) {
+
+function say(to, msg) {
+	if (msg == "") {
+		msg = to
+		if (DST ~ "^#")
+			to = DST
+		else if (DST == NICK && FROM)
+			to = FROM
+		else
+			to = CHANNEL
+	}
 	send("PRIVMSG " to " :" msg)
 }
-function say(msg) {
-	if (DST ~ "^#")
-		privmsg(DST, msg)
-	else if (DST == NICK && FROM)
-		privmsg(FROM, msg)
+
+function action(to, msg)
+{
+	if (msg)
+		say(to, "\001ACTION " msg "\001")
 	else
-		privmsg(CHANNEL, msg)
+		say("\001ACTION " to "\001")
 }
 
 function reply(msg) {
