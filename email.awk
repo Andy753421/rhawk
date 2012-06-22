@@ -6,15 +6,15 @@ END   { json_save("var/mail.txt", mail_enable) }
 
 # Email notifications
 BEGIN {
-	mail_hist   = 2*60 # If the users has not spoken withn mail_before before 
-	mail_before = 2*60 # someone mentions their name and does not reply within
-	mail_after  = 2*60 # mail_after seconds, email them hist seconds of the backlog
+	mail_hist   = 5*60 # If the users has not spoken withn mail_before before
+	mail_before = 5*60 # someone mentions their name and does not reply within
+	mail_after  = 5*60 # mail_after seconds, email them hist seconds of the backlog
 
 	mail_from   = NICK "<andy753421@gmail.com>"
 	mail_err    = "If you received this message in error,\n" \
 	              "someone in #rhnoise is being a jerk"
 
-	for (_user in mail_enable) 
+	for (_user in mail_enable)
 		debug("watching " mail_enable[_user] " for " _user)
 }
 
@@ -43,7 +43,7 @@ function mail_prep(user, chan,
 	for (si = 1; si <= sn; si++) {
 		sec = ss[si]
 		mn = length(mail_log[chan][sec])
-		for (mi = 0; mi < mn; mi++) { 
+		for (mi = 0; mi < mn; mi++) {
 			msg = mail_log[chan][sec][mi]
 			if (sec > mail_ready[user][chan] - mail_hist) {
 				if (msg ~ user)
