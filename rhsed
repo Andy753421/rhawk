@@ -1,0 +1,62 @@
+# Clear hold space
+x; s/.*//; x
+
+# Debug input
+s/^/< /
+w /dev/stderr
+s/^< //
+
+# Setup variables:
+s/[$=]/&\\/g
+s/\(:\([^ ]*\) \)\?\(\([^ ]*\) \)\(\([^ ]*\) \)\?\(:\(.*\)\)/AUTH= SERVER= NICK= CHANNEL= CMD=\4 SRC=\2 DST=\6 TO= FROM= MSG=\8/
+s/\(TO=\)\(.*MSG=\([^:,]\+\)[:,]\)/\1\3\2/
+s/\(SRC=\([^!]\+\)!.*\)\(FROM=\)/\1\3\2/
+s/CHANNEL=/&#rhnoise/
+s/NICK=/&rhsed/
+s/SERVER=/&irc.freenode.net/
+s/\(AUTH=\)\(.*TO=rhsed.*FROM=andy753421\)/\1yes\2/
+
+# IRC library commands
+1                         { x; s/$/\nUSER andy c $SERVER :$NICK/; x; }
+1                         { x; s/$/\nNICK rhsed/; x; }
+/CMD=PING/                { x; s/$/\nPING :$MSG/; x; }
+/CMD=001.*MSG=.*Welcome/  { x; s/$/\nJOIN $CHANNEL/; x; }
+
+# Bot commands
+/MSG=.*\<sed\>/           { x; s/$/\n.say Sed!/; x; }
+/NICK=\([^ ]*\).*MSG=\1:/ { x; s/$/\n.say Hello, $FROM/; x; }
+/MSG=.dup/                { x; s/$/\n.say Dup! $MSG/; x; }
+/MSG=.ping/               { x; s/$/\n.reply Pong!/; x; }
+/AUTH=yes.*MSG=.*die in a fire/Q
+
+# Helper functions
+x
+s/\n.reply /\n.say $FROM: /g
+s/\n.say *\([^\n]*\)/\nPRIVMSG #rhnoise :\1/g
+x
+
+# Replace variables
+G
+:vars
+s/\(.*SERVER=\([^ ]*\).*\n.*\)\$SERVER/\1\2/
+s/\(.*NICK=\([^ ]*\).*\n.*\)\$NICK/\1\2/
+s/\(.*CHANNEL=\([^ ]*\).*\n.*\)\$CHANNEL/\1\2/
+s/\(.*CMD=\([^ ]*\).*\n.*\)\$CMD/\1\2/
+s/\(.*SRC=\([^ ]*\).*\n.*\)\$SRC/\1\2/
+s/\(.*DST=\([^ ]*\).*\n.*\)\$DST/\1\2/
+s/\(.*TO=\([^ ]*\).*\n.*\)\$TO/\1\2/
+s/\(.*FROM=\([^ ]*\).*\n.*\)\$FROM/\1\2/
+s/\(.*MSG=\([^\n]*\)\n.*\)\$MSG/\1\2/
+t vars
+
+## Output
+s/^[^\n]*\n*//
+s/\([$=]\)\\/\1/g
+/./ {
+	w /dev/stdout
+	s/\(^\|\n\)/\1> /g
+	w /dev/stderr
+}
+d
+
+# vim: ft=sed
