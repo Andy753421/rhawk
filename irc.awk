@@ -101,12 +101,16 @@ function topic(chan, msg) {
 BEGIN {
 	if (CHILD == "") {
 		debug("Starting server");
-		status = system("awk -f rhawk -v CHILD=1 -v FIRST=1");
+		cmd = "awk -f rhawk -v CHILD=1 -v START=" systime();
+		status = system(cmd " -v FIRST=1");
 		while (status)
-			status = system("awk -f rhawk -v CHILD=1");
+			status = system(cmd);
 		exit(0);
 	} else {
-		debug("Starting child: CHILD=" CHILD " FIRST=" FIRST);
+		debug("Starting child:" \
+		      " CHILD=" CHILD   \
+		      " START=" START   \
+		      " FIRST=" FIRST);
 	}
 }
 
@@ -135,9 +139,9 @@ function reload() {
 
 	match(MSG, /(([^ :,]*)[:,] *)?(.*)/, arr);
 	TO  = arr[2]
-	$0  = TO == NICK ? arr[3] : MSG
+	$0  = TO ? arr[3] : MSG
 
-	if (CMD == "PRIVMSG" && DST == NICK && FROM)
+	if (CMD == "PRIVMSG" && DST == NICK && FROM && !TO)
 		TO = DST
 
 	#set()

@@ -1,8 +1,21 @@
 @include "json.awk"
 
 # Save email addresses
-BEGIN { json_load("var/mail.txt", mail_enable) }
-END   { json_save("var/mail.txt", mail_enable) }
+END {
+	json_save("var/mail.txt", mail_enable)
+}
+
+BEGIN {
+	json_load("var/mail.txt", mail_enable)
+	for (_user in mail_enable)
+		debug("watching " mail_enable[_user] " for " _user)
+}
+
+TO == NICK && /^sync/ {
+	json_load("var/mail.txt", mail_enable)
+	for (_user in mail_enable)
+		debug("watching " mail_enable[_user] " for " _user)
+}
 
 # Email notifications
 BEGIN {
@@ -13,9 +26,6 @@ BEGIN {
 	mail_from   = NICK "<andy753421@gmail.com>"
 	mail_err    = "If you received this message in error,\n" \
 	              "someone in #rhnoise is being a jerk"
-
-	for (_user in mail_enable)
-		debug("watching " mail_enable[_user] " for " _user)
 }
 
 function mail_send(addr, subj, body,

@@ -2,7 +2,7 @@
 
 @include "irc.awk"
 @include "spades.awk"
-@include "email.awk"
+#@include "email.awk"
 
 # Initialization
 BEGIN {
@@ -75,9 +75,10 @@ CMD == "NICK" && FROM in bots {
 # SFV Lug
 BEGIN { pollchan = "#sfvlug" }
 (CMD == "PING"    && systime()-lastpoll > 60*60*24) ||
-(CMD == "PRIVMSG" && DST == pollchan && /^\.poll/) {
+(CMD == "PRIVMSG" && /^\.poll/) {
 	if (!topics[pollchan]) {
 		debug("Unknown topic for " pollchan);
+		send("TOPIC " pollchan)
 		next
 	}
 	_curl     = "curl -s http://sfvlug.org/"
@@ -85,6 +86,7 @@ BEGIN { pollchan = "#sfvlug" }
 	_web_ptrn = "next meeting.*" _day "\\w+[, ]+([A-Z]\\w+) +([0-9]+)[, ]+([0-9]+)"
 	_irc_ptrn = _day "\\w*[, ]+([A-Z]\\w+) +([0-9]+)"
 	while (_curl | getline _line) {
+		#debug("match(" _line ", " _web_ptrn ", ..)")
 		if (match(_line, _web_ptrn, _parts)) {
 			_date  = _parts[1] " " _parts[2] " " _parts[3]
 			_topic = topics[pollchan]
@@ -98,6 +100,25 @@ BEGIN { pollchan = "#sfvlug" }
 	}
 	lastpoll = systime()
 	close(cmd)
+}
+
+# Uptime
+function uptime(time,  fmt) {
+	fmt = "%d:%02d:%02d:%02d"
+	fmt = "%d days %02d:%02d:%02d"
+	return sprintf(fmt,
+		time / (60*60*24),
+		time / (60*60   ) % 24,
+		time / (60      ) % 60,
+		time / (1       ) % 60)
+}
+BEGIN {
+	up_reload = systime();
+}
+/^\.uptime/ {
+	_now = systime();
+	say("uptime: " uptime(_now - START) ", " \
+	    "reload: " uptime(_now - up_reload))
 }
 
 # Fortune
@@ -121,15 +142,29 @@ FROM ~ OWNER && /^go go gadget woop/ {
 		say(".delay " i " seconds; .woop " i)
 }
 
-TO == NICK && /^[Ww][Oo]+[Pp]/ {
+function woop(msg) {
 	gsub(/[^Oo]/, "", $1)
 	_len = length($1)
 	if (_len == 2)
 		_len = 10
-	_woop = "WOOP"
+	if ($2)
+		_len = $2
+	_woop = msg
 	for (i=1; i<_len; i++)
-		_woop = _woop " WOOP"
+		_woop = _woop " " msg
 	say(_woop)
+}
+
+TO == NICK && /^[Ww][Oo]+[Pp] *([0-9]*)/ {
+	woop("WOOP")
+}
+
+/^~WOOP *([0-9]*)/ {
+	woop("(00/")
+}
+
+/^~woop *([0-9]*)/ {
+	woop("^H^P^P^O")
 }
 
 TO == NICK && DST ~ /^#/ {
@@ -143,14 +178,59 @@ MSG !~ /^\./ &&
 }
 
 !(FROM in bots) &&
-/^[^.](help|halp)/ {
+((TO == NICK && /(help|halp)/) ||
+ /^[^.](help|halp)/) {
 	reply("Nothing can help you now..")
 }
 
-/Ho.*Ho.*Ho/ {
+/(\<[Hh][Oo]\>.*){3}/ {
 	say("\00309Merry \00304Christmas!")
 }
 
+!(FROM in bots) &&
+tolower($0) ~ /\<cloud\>/ {
+	_cmd = "shuf clouds.txt"
+	_cmd | getline _cloud
+	close(_cmd)
+	say(_cloud)
+}
+
+/^headshot [Cc]hristmas/ {
+	say(".load Christmas")
+	say(".jingle")
+	say(".unload Christmas")
+}
+
+FROM == "rhnoise" && $2 == "slaps" && $3 == NICK {
+	say(".spin")
+}
+
+/^[Aa]nd now[.,]/ {
+	say("And now...");
+	say("THE LARCH");
+}
+
+# God damn commands
+FROM == "rhnoise" && load_mod {
+	say(".load " load_mod)
+	say("rhnoise: You slag!")
+}
+// {
+	load_mod = ""
+}
+(TO  ==  "rhnoise" && /^load \w+/) ||
+(DST == "#rhniose" && /^\.load [a-z]\w+/) {
+	gsub(/[^a-zA-Z0-9_]/, " ")
+	load_mod = toupper(substr($2,1,1)) substr($2,2);
+}
+
+(DST == "#rhnoise" && /^\.line /) {
+	sub(/\./, "!");
+	say($0);
+	say("scalawag: You slag!")
+}
+
+# Misc
 { fflush("") }
 
 # vim: ft=awk
