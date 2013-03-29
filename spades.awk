@@ -65,7 +65,8 @@ function sp_next(who, prev)
 {
 	prev      = sp_turn
 	sp_turn   = who ? sp_players[who] : (sp_turn + 1) % 4
-	sp_player = sp_order[sp_turn]
+	if (length(sp_order) == 4)
+		sp_player = sp_order[sp_turn]
 	return prev
 }
 
@@ -335,6 +336,8 @@ sp_state == "bid" &&
 		} else if ($2 == 0) {
 			say(FROM " goes nil!")
 			sp_nil[i] = 1
+		} else {
+			sp_nil[i] = 0
 		}
 		if (sp_turn != sp_dealer) {
 			say("Bidding goes to " sp_player "!")
@@ -425,7 +428,7 @@ sp_state == "play" &&
 	else {
 		sp_play(card)
 		if (sp_state == "play") {
-			if (sp_hands[FROM])
+			if (length(sp_hands[FROM]))
 				say(FROM, "You have: " sp_hand(FROM))
 			if (sp_piles)
 				say(sp_player ": it is your turn! " \
