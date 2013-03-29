@@ -249,6 +249,15 @@ FROM == "rhnoise" && load_mod {
 	say("scalawag: You slag!")
 }
 
+(DST == "#rhnoise" && /^\.qdb 268$/) {
+	say(".diediedie");
+	next
+}
+(DST == "#rhnoise" && /\.qdb *268/) {
+	say(".slap " FROM);
+	next
+}
+
 # Misc
 { fflush("") }
 
