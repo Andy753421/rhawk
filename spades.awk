@@ -1,3 +1,6 @@
+# For saving
+@include "json.awk"
+
 # Functions
 function sp_init(cards, tmp0, tmp1)
 {
@@ -46,6 +49,81 @@ function sp_reset(type)
 		delete sp_order     # [i] Player order order[i] -> "name"
 		delete sp_scores    # [i] Teams score
 	}
+}
+
+function sp_acopy(dst, src,	key)
+{
+	if (isarray(src))
+		for (key in src)
+			json_copy(dst, key, src[key])
+}
+
+function sp_save(file,	game)
+{
+	# Per hand
+	game["suit"]    = sp_suit;
+	game["piles"]   = sp_piles;
+	json_copy(game, "pile",    sp_pile);
+
+	# Per round
+	game["state"]   = sp_state;
+	game["broken"]  = sp_broken;
+	json_copy(game, "looked",  sp_looked);
+	json_copy(game, "bids",    sp_bids);
+	json_copy(game, "nil",     sp_nil);
+	json_copy(game, "pass",    sp_pass);
+	json_copy(game, "tricks",  sp_tricks);
+
+	# Per game
+	game["channel"] = sp_channel;
+	game["owner"]   = sp_owner;
+	game["playto"]  = sp_playto;
+	game["dealer"]  = sp_dealer;
+	game["turn"]    = sp_turn;
+	game["player"]  = sp_player;
+	game["valid"]   = sp_valid;
+	json_copy(game, "hands",   sp_hands);
+	json_copy(game, "players", sp_players);
+	json_copy(game, "order",   sp_order);
+	json_copy(game, "scores",  sp_scores);
+
+	# Save
+	json_save(file, game);
+	say("Game saved.")
+}
+
+function sp_load(file,	game)
+{
+	# Load
+	json_load(file, game);
+
+	# Per hand
+	sp_suit    = game["suit"];
+	sp_piles   = game["piles"];
+	sp_acopy(sp_pile,    game["pile"]);
+
+	# Per round
+	sp_state   = game["state"];
+	sp_broken  = game["broken"];
+	sp_acopy(sp_looked,  game["looked"]);
+	sp_acopy(sp_bids,    game["bids"]);
+	sp_acopy(sp_nil,     game["nil"]);
+	sp_acopy(sp_pass,    game["pass"]);
+	sp_acopy(sp_tricks,  game["tricks"]);
+
+	# Per game
+	sp_channel = game["channel"];
+	sp_owner   = game["owner"];
+	sp_playto  = game["playto"];
+	sp_dealer  = game["dealer"];
+	sp_turn    = game["turn"];
+	sp_player  = game["player"];
+	sp_valid   = game["valid"];
+	sp_acopy(sp_hands,   game["hands"]);
+	sp_acopy(sp_players, game["players"]);
+	sp_acopy(sp_order,   game["order"]);
+	sp_acopy(sp_scores,  game["scores"]);
+	say("Game loaded.")
 }
 
 function sp_pretty(cards, who)
@@ -243,12 +321,24 @@ BEGIN {
 	say("Spades! " sp_pretty("As,Ah,Ad,Ac", FROM))
 }
 
+FROM == OWNER &&
+/^\.savegame/ {
+	sp_save("var/spades.json");
+}
+
+FROM == OWNER &&
+/^\.loadgame/ {
+	sp_load("var/spades.json");
+}
+
 # Help
 /^\.help [Ss]pades$/ {
 	say("Spades -- play a game of spades")
 	say("Examples:")
 	say(".newgame [score] -- start a game to <score> points, default 500")
 	say(".endgame -- abort the current game")
+	say(".savegame -- save the current game to disk")
+	say(".loadgame -- load the previously saved game")
 	say(".join -- join the current game")
 	say(".look -- look at your cards")
 	say(".bid n -- bid for <n> tricks")
