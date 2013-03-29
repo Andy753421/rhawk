@@ -1,11 +1,6 @@
 # Functions
 function sp_init(cards, tmp0, tmp1)
 {
-	sp_valid    = 0     #     Message sent from sp_player
-	sp_player   = ""    #     Who's turn it is
-	sp_turn     = 0     #     Index of who's turn it is
-	delete sp_hands     # [p] Each players cards
-
 	# Init deck
 	cards ="As Ks Qs Js 10s 9s 8s 7s 6s 5s 4s 3s 2s "\
 	       "Ah Kh Qh Jh 10h 9h 8h 7h 6h 5h 4h 3h 2h "\
@@ -43,6 +38,10 @@ function sp_reset(type)
 		sp_owner    = ""    #     Who started the game
 		sp_playto   = 0     #     Score the game will go to
 		sp_dealer   =-1     #     Who is dealing this round
+		sp_turn     = 0     #     Index of who's turn it is
+		sp_player   = ""    #     Who's turn it is
+		sp_valid    = 0     #     Message sent from sp_player
+		delete sp_hands     # [p] Each players cards
 		delete sp_players   # [p] Player names players["name"] -> i
 		delete sp_order     # [i] Player order order[i] -> "name"
 		delete sp_scores    # [i] Teams score
@@ -150,10 +149,10 @@ function sp_score(	bids, tricks)
 			sp_scores[i] -= 100
 		}
 		if (tricks >= bids) {
-			say(sp_team(i) " make their bid")
+			say(sp_team(i) " make their bid: " tricks "/" bids)
 			sp_scores[i] += bids*10 + bags;
 		} else {
-			say(sp_team(i) " go bust")
+			say(sp_team(i) " go bust: " tricks "/" bids)
 			sp_scores[i] -= bids*10;
 		}
 	}
@@ -289,7 +288,7 @@ FROM == OWNER &&
 		reply("There is no game in progress.")
 	} else {
 		say(FROM " ends the game")
-		sp_reset(5)
+		sp_reset(2)
 	}
 }
 
@@ -425,8 +424,9 @@ sp_state == "play" &&
 	}
 	else {
 		sp_play(card)
-		say(FROM, "You have: " sp_hand(FROM))
 		if (sp_state == "play") {
+			if (sp_hands[FROM])
+				say(FROM, "You have: " sp_hand(FROM))
 			if (sp_piles)
 				say(sp_player ": it is your turn! " \
 				    "(" sp_pretty(sp_piles, sp_player) ")")
