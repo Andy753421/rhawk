@@ -117,10 +117,10 @@ BEGIN { pollchan = "#sfvlug" }
 		}
 	}
 	lastpoll = systime()
-	close(cmd)
+	close(_curl)
 }
 
-# Uptime
+# Versin/Uptime
 function uptime(time,  fmt) {
 	fmt = "%d:%02d:%02d:%02d"
 	fmt = "%d days %02d:%02d:%02d"
@@ -131,7 +131,13 @@ function uptime(time,  fmt) {
 		time / (1       ) % 60)
 }
 BEGIN {
+	_cmd = "git describe --always --dirty";
+	_cmd | getline up_version;
+	close(_cmd);
 	up_reload = systime();
+}
+/^\.version/ {
+	say("version: " up_version)
 }
 /^\.uptime/ {
 	_now = systime();
