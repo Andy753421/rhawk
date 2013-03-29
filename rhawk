@@ -73,7 +73,23 @@ CMD == "NICK" && FROM in bots {
 }
 
 # SFV Lug
+function email(to, from, subj, body, sendmail)
+{
+	from     = NICK "<andy@pileus.org>"
+	subj     = "Update sfvlug.org!"
+	body     = "The next SFVLUG meeting is TBA!"
+	sendmail = "/usr/sbin/sendmail '" to "'"
+	print "To: " to        | sendmail
+	print "From: " from    | sendmail
+	print "Subject: " subj | sendmail
+	print ""               | sendmail
+	print body             | sendmail
+	say("Topic out of date, emailing " to);
+	close(sendmail)
+}
+
 BEGIN { pollchan = "#sfvlug" }
+#(CMD == "TOPIC"   && systime()-lastpoll > 60*60*24) ||
 (CMD == "PING"    && systime()-lastpoll > 60*60*24) ||
 (CMD == "PRIVMSG" && /^\.poll/) {
 	if (!topics[pollchan]) {
@@ -83,10 +99,12 @@ BEGIN { pollchan = "#sfvlug" }
 	}
 	_curl     = "curl -s http://sfvlug.org/"
 	_day      = "(Sun|Mon|Tue|Wed|Thu|Fri|Sat)"
+	_web_tba  = "next meeting is: TBA"
 	_web_ptrn = "next meeting.*" _day "\\w+[, ]+([A-Z]\\w+) +([0-9]+)[, ]+([0-9]+)"
 	_irc_ptrn = _day "\\w*[, ]+([A-Z]\\w+) +([0-9]+)"
 	while (_curl | getline _line) {
-		#debug("match(" _line ", " _web_ptrn ", ..)")
+		if (match(_line, _web_tba))
+			email("Brian <brian@zimage.com>");
 		if (match(_line, _web_ptrn, _parts)) {
 			_date  = _parts[1] " " _parts[2] " " _parts[3]
 			_topic = topics[pollchan]
@@ -171,6 +189,7 @@ TO == NICK && DST ~ /^#/ {
 	#say("Hello, " FROM)
 }
 
+#DST != "#sfvlug" &&
 !(FROM in bots) &&
 MSG !~ /^\./ &&
 /awk/ {
