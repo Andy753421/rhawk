@@ -19,7 +19,6 @@
 # 	\t
 # 	\u four-hex-digits
 
-
 # Helpers
 function json_gettype(value,   key, sort, n, i)
 {
@@ -33,6 +32,8 @@ function json_gettype(value,   key, sort, n, i)
 				return "object"
 		return "array"
 	} else {
+		if (value == 0 && value == "")
+			return "null"
 		if (value == value + 0)
 			return "number"
 		if (value == value "")
@@ -71,6 +72,7 @@ function json_write_value(value, pad)
 		case "array":  return json_write_array(value, pad)
 		case "number": return json_write_number(value)
 		case "string": return json_write_string(value)
+		case "null":   return "null"
 		default:       return "error"
 	}
 }
@@ -116,7 +118,7 @@ function json_tokenize(str, tokens,   i, items, table, type, found)
 {
 	table["term"]  = "^[\\[\\]{}:,]"
 	table["str"]   = "^\"[^\"]*\""
-	table["num"]   = "^[0-9]+"
+	table["num"]   = "^[+-]?[0-9]+(.[0-9]+)?"
 	table["var"]   = "^(true|false|null)"
 	table["space"] = "^[ \\t\\n]+"
 	i = 0
@@ -227,16 +229,20 @@ function json_parse_number(tokens, i, value, key,   text)
 function json_parse_string(tokens, i, value, key,   text)
 {
 	text = tokens[i++]["text"]
-	text = substr(text, 2, length(text)-2)
+	len  = length(text);
+	text = len == 2 ? "" : substr(text, 2, len-2)
 	json_copy(value, key, text)
-	#print "parse_string: " text
+	#print "parse_string: [" text "]"
 	return i
 }
 
-function json_parse_var(tokens, i, value, key,   text)
+function json_parse_var(tokens, i, value, key,   text, null)
 {
-	text = tokens[i++]["text"]
-	json_copy(value, key, text == "true")
+	switch (tokens[i++]["text"]) {
+		case "true":  json_copy(value, key, 1==1); break;
+		case "false": json_copy(value, key, 1==2); break;
+		case "null":  json_copy(value, key, null); break;
+	}
 	#print "parse_var: " text " -> " text == "true"
 	return i
 }
@@ -298,15 +304,18 @@ function json_test_read()
 {
 	json_tokenize("[8, \"abc\", 9]", tokens)
 	json_parse_value(tokens, 0, array, 0)
-	json_print write_value(array[0])
+	print json_write_value(array[0])
 
 	json_tokenize("{\"abc\": 1, \"def\": 2}", tokens)
 	json_parse_value(tokens, 0, array, 0)
-	json_print write_value(array[0])
+	print json_write_value(array[0])
 
-	json = "{ \"first\":  { \"arr\":    [ \"zero\",         " \
-	       "                              \"one\",          " \
-	       "                              \"two\" ],        " \
+	json = "{ \"first\":  { \"arr\":    [ \"\",             " \
+	       "                              -1,               " \
+	       "                              1.2,              " \
+	       "                              true,             " \
+	       "                              false,            " \
+	       "                              null    ],        " \
 	       "                \"number\": 42,                 " \
 	       "                \"obj\":    { \"A\": \"a!\",    " \
 	       "                              \"B\": \"b!\",    " \
