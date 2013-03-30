@@ -81,7 +81,6 @@ function sp_save(file,	game)
 	game["dealer"]  = sp_dealer;
 	game["turn"]    = sp_turn;
 	game["player"]  = sp_player;
-	game["valid"]   = sp_valid;
 	json_copy(game, "hands",   sp_hands);
 	json_copy(game, "players", sp_players);
 	json_copy(game, "order",   sp_order);
@@ -118,7 +117,6 @@ function sp_load(file,	game)
 	sp_dealer  = game["dealer"];
 	sp_turn    = game["turn"];
 	sp_player  = game["player"];
-	sp_valid   = game["valid"];
 	sp_acopy(sp_hands,   game["hands"]);
 	sp_acopy(sp_players, game["players"]);
 	sp_acopy(sp_order,   game["order"]);
@@ -543,6 +541,11 @@ sp_state == "play" &&
 	    sp_order[2] " took " int(sp_tricks[2]) "/" int(sp_bids[2]))
 	say(sp_order[1] " took " int(sp_tricks[1]) "/" int(sp_bids[1]) ", " \
 	    sp_order[3] " took " int(sp_tricks[3]) "/" int(sp_bids[3]))
+}
+
+/\.turn/ {
+	if (sp_state == "bid" || sp_state == "play")
+		say("It is " sp_player "'s turn.");
 }
 
 (TO == NICK || DST == sp_channel) &&
