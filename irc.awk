@@ -21,7 +21,8 @@
 function send(msg) {
 	print "  > " msg > "/dev/stderr"
 	print msg
-	system("sleep 1")
+	if (!DEBUG)
+		system("sleep 1")
 	fflush()
 }
 
@@ -101,13 +102,17 @@ function topic(chan, msg) {
 BEGIN {
 	if (CHILD == "") {
 		debug("Starting server");
-		cmd = "awk -f rhawk -v CHILD=1 -v START=" systime();
+		cmd = "awk -f rhawk" \
+		      " -v CHILD=1" \
+		      " -v START=" systime() \
+		      " -v DEBUG=" !!DEBUG
 		status = system(cmd " -v FIRST=1");
 		while (status)
 			status = system(cmd);
 		exit(0);
 	} else {
 		debug("Starting child:" \
+		      " DEBUG=" DEBUG   \
 		      " CHILD=" CHILD   \
 		      " START=" START   \
 		      " FIRST=" FIRST);

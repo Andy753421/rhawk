@@ -18,29 +18,35 @@
 #   l    - look
 #   bn   - bid n
 #   s    - score
+#   B    - bids
+#   t    - tricks
+#   t    - tricks
+#   T    - turn
+#   pn   - pass card n
 #   card - play card
 #  -card - play but don't add to deck
 #  +card - add to deck but don't play
 
 # Test scoring
-#x: s s s s s s s  s  s  s  s  s
-#x: B B B B B B B  B  B  B  B  B
-#x: t t t t t t t  t  t  t  t  t
-#A: n j . . . d b3 .  .  .  As .
-#b: . . j . . d .  b3 .  .  Ah .
-#c: . . . j . d .  .  b3 .  Ad .
-#d: . . . . j d .  .  .  b3 Ac .
+x: s s s s s s s  s  s  s  s  s
+x: B B B B B B B  B  B  B  B  B
+x: t t t t t t t  t  t  t  t  t
+x: T T T T T T T  T  T  T  T  T
+A: n j . . . d b3 .  .  .  As .
+b: . . j . . d .  b3 .  .  Ah .
+c: . . . j . d .  .  b3 .  Ad .
+d: . . . . j d .  .  .  b3 Ac .
 
 # Nil/blind
-a: n j d l b0  .  .    As Ks Qs Js 10s 9s 8s 7s 6s 5s 4s 3s 2s t e
-b: . j d . b0 +Ah pAh -Ac Kh Qh Jh 10h 9h 8h 7h 6h 5h 4h 3h 2h s
-c: . j d . b7  .  .    Ad Kd Qd Jd 10d 9d 8d 7d 6d 5d 4d 3d 2d .
-d: . j d . b7 +Ac pAc -Ah Kc Qc Jc 10c 9c 8c 7c 6c 5c 4c 3c 2c .
+#a: n j d l b0  .  .    As Ks Qs Js 10s 9s 8s 7s 6s 5s 4s 3s 2s t e
+#b: . j d . b0 +Ah pAh -Ac Kh Qh Jh 10h 9h 8h 7h 6h 5h 4h 3h 2h s
+#c: . j d . b7  .  .    Ad Kd Qd Jd 10d 9d 8d 7d 6d 5d 4d 3d 2d .
+#d: . j d . b7 +Ac pAc -Ah Kc Qc Jc 10c 9c 8c 7c 6c 5c 4c 3c 2c .
 
 # Test full game
-#a: n j d . b1  +Ah As Ks Qs Js 10s 9s 8s 7s 6s 5s 4s 3s 2s t
-#b: . j d . b3   .  Ah Kh Qh Jh 10h 9h 8h 7h 6h 5h 4h 3h 2h s
-#c: . j d . b1   .  Ad Kd Qd Jd 10d 9d 8d 7d 6d 5d 4d 3d 2d .
-#d: . j d . b0   .  Ac Kc Qc Jc 10c 9c 8c 7c 6c 5c 4c 3c 2c .
+#a: n j d l b1  -Ah As Ks Qs Js 10s 9s 8s 7s 6s 5s 4s 3s 2s t
+#b: . j d l b3   .  Ah Kh Qh Jh 10h 9h 8h 7h 6h 5h 4h 3h 2h s
+#c: . j d l b1   .  Ad Kd Qd Jd 10d 9d 8d 7d 6d 5d 4d 3d 2d .
+#d: . j d l b2   .  Ac Kc Qc Jc 10c 9c 8c 7c 6c 5c 4c 3c 2c .
 
 # vim: ft=conf
