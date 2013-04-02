@@ -543,9 +543,25 @@ sp_state == "play" &&
 	    sp_order[3] " took " int(sp_tricks[3]) "/" int(sp_bids[3]))
 }
 
-/\.turn/ {
-	if (sp_state == "bid" || sp_state == "play")
-		say("It is " sp_player "'s turn.");
+/\.turn/ && sp_state ~ "(play|bid)" {
+	if (sp_turn > 0) {
+		t = sp_turn
+		d = sp_dealer
+		print d, t
+		_bids = (t>0 ? (     sp_order[(d+0)%4] ": " sp_bids[(d+0)%4]) : "") \
+		        (t>1 ? (", " sp_order[(d+1)%4] ": " sp_bids[(d+1)%4]) : "") \
+		        (t>2 ? (", " sp_order[(d+2)%4] ": " sp_bids[(d+2)%4]) : "") \
+		        (t>3 ? (", " sp_order[(d+3)%4] ": " sp_bids[(d+3)%4]) : "")
+		_pile = sp_pretty(sp_piles, sp_player)
+	}
+	if (sp_state == "bid" && sp_turn <= 0)
+		say("It is " sp_player "'s bid!")
+	if (sp_state == "bid" && sp_turn >  0)
+		say("It is " sp_player "'s bid! (" _bids ")")
+	if (sp_state == "play" && sp_turn <= 0)
+		say("It is " sp_player "'s turn!")
+	if (sp_state == "play" && sp_turn >  0)
+		say("It is " sp_player "'s turn! (" _pile ")")
 }
 
 (TO == NICK || DST == sp_channel) &&
