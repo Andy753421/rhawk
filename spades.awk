@@ -556,7 +556,7 @@ sp_state == "play" &&
 	    sp_order[3] " took " int(sp_tricks[3]) "/" int(sp_bids[3]))
 }
 
-/\.turn/ && sp_state ~ "(play|bid)" {
+/^\.turn/ && sp_state ~ "(play|bid)" {
 	_bids = sp_bidders()
 	_pile = sp_pretty(sp_piles, FROM)
 	if (sp_state == "bid" && !_bids)
