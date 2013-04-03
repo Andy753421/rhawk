@@ -215,6 +215,19 @@ function sp_bags(i,	bags)
 	return bags
 }
 
+function sp_bidders(	i, turn, bid, bids)
+{
+	for (i = 0; i < 4; i++) {
+		turn = (sp_dealer + i) % 4
+		if (sp_bids[turn] && !sp_nil[turn]) {
+			bid  = sp_order[turn] ":" sp_bids[turn]
+			bids = bids " " bid
+		}
+	}
+	gsub(/^ +| +$/, "", bids)
+	return bids
+}
+
 function sp_score(	bids, tricks)
 {
 	for (i=0; i<2; i++) {
@@ -544,23 +557,15 @@ sp_state == "play" &&
 }
 
 /\.turn/ && sp_state ~ "(play|bid)" {
-	if (sp_turn > 0) {
-		t = sp_turn
-		d = sp_dealer
-		print d, t
-		_bids = (t>0 ? (     sp_order[(d+0)%4] ": " sp_bids[(d+0)%4]) : "") \
-		        (t>1 ? (", " sp_order[(d+1)%4] ": " sp_bids[(d+1)%4]) : "") \
-		        (t>2 ? (", " sp_order[(d+2)%4] ": " sp_bids[(d+2)%4]) : "") \
-		        (t>3 ? (", " sp_order[(d+3)%4] ": " sp_bids[(d+3)%4]) : "")
-		_pile = sp_pretty(sp_piles, sp_player)
-	}
-	if (sp_state == "bid" && sp_turn <= 0)
+	_bids = sp_bidders()
+	_pile = sp_pretty(sp_piles, FROM)
+	if (sp_state == "bid" && !_bids)
 		say("It is " sp_player "'s bid!")
-	if (sp_state == "bid" && sp_turn >  0)
+	if (sp_state == "bid" && _bids)
 		say("It is " sp_player "'s bid! (" _bids ")")
-	if (sp_state == "play" && sp_turn <= 0)
+	if (sp_state == "play" && !_pile)
 		say("It is " sp_player "'s turn!")
-	if (sp_state == "play" && sp_turn >  0)
+	if (sp_state == "play" && _pile)
 		say("It is " sp_player "'s turn! (" _pile ")")
 }
 
