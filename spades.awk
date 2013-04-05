@@ -88,7 +88,6 @@ function sp_save(file,	game)
 
 	# Save
 	json_save(file, game);
-	say("Game saved.")
 }
 
 function sp_load(file,	game)
@@ -121,7 +120,6 @@ function sp_load(file,	game)
 	sp_acopy(sp_players, game["players"]);
 	sp_acopy(sp_order,   game["order"]);
 	sp_acopy(sp_scores,  game["scores"]);
-	say("Game loaded.")
 }
 
 function sp_pretty(cards, who)
@@ -321,6 +319,9 @@ BEGIN {
 	srand(seed)
 	sp_init()
 	sp_reset(2)
+	sp_load("var/sp_cur.json");
+	if (sp_channel)
+		say(sp_channel, "Game restored.")
 }
 
 // {
@@ -334,12 +335,14 @@ BEGIN {
 
 FROM == OWNER &&
 /^\.savegame/ {
-	sp_save("var/spades.json");
+	sp_save("var/sp_save.json");
+	say("Game saved.")
 }
 
 FROM == OWNER &&
 /^\.loadgame/ {
-	sp_load("var/spades.json");
+	sp_load("var/sp_save.json");
+	say("Game loaded.")
 }
 
 # Help
@@ -587,6 +590,10 @@ sp_state == "play" &&
 		    int(sp_scores[1]) " points, " \
 		    int(sp_bags(1))   " bags")
 	}
+}
+
+/^\.((new|end|load)game|join|look|bid|play)/ {
+	sp_save("var/sp_cur.json");
 }
 
 # Standin
