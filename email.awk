@@ -2,17 +2,17 @@
 
 # Save email addresses
 END {
-	json_save("var/mail.txt", mail_enable)
+	json_save("var/mail.json", mail_enable)
 }
 
 BEGIN {
-	json_load("var/mail.txt", mail_enable)
+	json_load("var/mail.json", mail_enable)
 	for (_user in mail_enable)
 		debug("watching " mail_enable[_user] " for " _user)
 }
 
 TO == NICK && /^sync/ {
-	json_load("var/mail.txt", mail_enable)
+	json_load("var/mail.json", mail_enable)
 	for (_user in mail_enable)
 		debug("watching " mail_enable[_user] " for " _user)
 }
