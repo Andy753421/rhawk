@@ -1,6 +1,7 @@
 #!awk -f
 
 @include "irc.awk"
+@include "json.awk"
 @include "spades.awk"
 #@include "email.awk"
 
@@ -8,6 +9,7 @@
 BEGIN {
 	OWNER = "andy753421"
 	connect("localhost", "rhawk", "#rhtest");
+	json_load("var/plain.json", plain);
 	if (FIRST) {
 		join("#rhnoise")
 		join("#rhspades")
@@ -66,10 +68,12 @@ CMD == "NICK" && FROM in bots {
 # Unicode
 /[Uu]nicode :-?\(/ {
 	plain[FROM] = 1
+	json_save("var/plain.json", plain);
 }
 
 /[Uu]nicode :-?\)/ {
-	plain[FROM] = 0
+	delete plain[FROM]
+	json_save("var/plain.json", plain);
 }
 
 # SFV Lug
