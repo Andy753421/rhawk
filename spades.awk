@@ -44,6 +44,7 @@ function sp_reset(type)
 		sp_turn     = 0     #     Index of who's turn it is
 		sp_player   = ""    #     Who's turn it is
 		sp_valid    = 0     #     Message sent from sp_player
+		sp_limit    = 10    #     Bag out limit
 		delete sp_hands     # [p] Each players cards
 		delete sp_players   # [p] Player names players["name"] -> i
 		delete sp_order     # [i] Player order order[i] -> "name"
@@ -81,6 +82,7 @@ function sp_save(file,	game)
 	game["dealer"]  = sp_dealer;
 	game["turn"]    = sp_turn;
 	game["player"]  = sp_player;
+	game["limit"]   = sp_limit;
 	json_copy(game, "hands",   sp_hands);
 	json_copy(game, "players", sp_players);
 	json_copy(game, "order",   sp_order);
@@ -116,6 +118,7 @@ function sp_load(file,	game)
 	sp_dealer  = game["dealer"];
 	sp_turn    = game["turn"];
 	sp_player  = game["player"];
+	sp_limit   = game["limit"];
 	sp_acopy(sp_hands,   game["hands"]);
 	sp_acopy(sp_players, game["players"]);
 	sp_acopy(sp_order,   game["order"]);
@@ -207,9 +210,9 @@ function sp_team(i)
 
 function sp_bags(i,	bags)
 {
-	bags = sp_scores[i] % 10
+	bags = sp_scores[i] % sp_limit
 	if (bags < 0)
-		bags += 10
+		bags += sp_limit
 	return bags
 }
 
@@ -232,9 +235,9 @@ function sp_score(	bids, tricks)
 		bids   = sp_bids[i]   + sp_bids[i+2]
 		tricks = sp_tricks[i] + sp_tricks[i+2]
 		bags   = tricks - bids
-		if (sp_bags(i) + bags >= 10) {
+		if (sp_bags(i) + bags >= sp_limit) {
 			say(sp_team(i) " bag out")
-			sp_scores[i] -= 100
+			sp_scores[i] -= sp_limit * 10
 		}
 		if (tricks >= bids) {
 			say(sp_team(i) " make their bid: " tricks "/" bids)
@@ -380,9 +383,10 @@ FROM == OWNER &&
 	} else {
 		sp_owner   = FROM
 		sp_playto  = $2 ? $2 : 200
+		sp_limit   = sp_playto > 200 ? 10 : 5;
 		sp_state   = "join"
 		sp_channel = DST
-		say(sp_owner " starts a game of Spades to " sp_playto "!")
+		say(sp_owner " starts a game of Spades to " sp_playto " with " sp_limit " bags!")
 		#say("#rhnoise", sp_owner " starts a game of Spades in " DST "!")
 	}
 }
