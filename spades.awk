@@ -16,6 +16,12 @@ function sp_init(cards, tmp0, tmp1)
 
 function sp_reset(type)
 {
+	# Per message
+	if (type >= 0) {
+		sp_from     = ""    #    The speakers player name
+		sp_valid    = ""    #    It is the speaker turn
+	}
+
 	# Per hand
 	if (type >= 0) {
 		sp_suit     = ""    #     The lead suit {s,h,d,c}
@@ -43,10 +49,10 @@ function sp_reset(type)
 		sp_dealer   =-1     #     Who is dealing this round
 		sp_turn     = 0     #     Index of who's turn it is
 		sp_player   = ""    #     Who's turn it is
-		sp_valid    = 0     #     Message sent from sp_player
 		sp_limit    = 10    #     Bag out limit
 		delete sp_hands     # [p] Each players cards
 		delete sp_players   # [p] Player names players["name"] -> i
+		delete sp_cloaks    # [c] Player cloaks cloaks["cloak"] -> "name"
 		delete sp_order     # [i] Player order order[i] -> "name"
 		delete sp_scores    # [i] Teams score
 	}
@@ -85,6 +91,7 @@ function sp_save(file,	game)
 	game["limit"]   = sp_limit;
 	json_copy(game, "hands",   sp_hands);
 	json_copy(game, "players", sp_players);
+	json_copy(game, "cloaks",  sp_cloaks);
 	json_copy(game, "order",   sp_order);
 	json_copy(game, "scores",  sp_scores);
 
@@ -121,6 +128,7 @@ function sp_load(file,	game)
 	sp_limit   = game["limit"];
 	sp_acopy(sp_hands,   game["hands"]);
 	sp_acopy(sp_players, game["players"]);
+	sp_acopy(sp_cloaks,  game["cloaks"]);
 	sp_acopy(sp_order,   game["order"]);
 	sp_acopy(sp_scores,  game["scores"]);
 }
@@ -263,7 +271,7 @@ function sp_score(	bids, tricks)
 
 function sp_play(card,	winner, pi)
 {
-	delete sp_hands[FROM][card]
+	delete sp_hands[sp_from][card]
 	sp_pile[card] = sp_player
 	sp_piles      = sp_piles (sp_piles?",":"") card
 	sp_next()
@@ -328,7 +336,8 @@ BEGIN {
 }
 
 // {
-	sp_valid = (FROM && FROM == sp_player)
+	sp_from  = AUTH in sp_cloaks ? sp_cloaks[AUTH] : FROM
+	sp_valid = sp_from && sp_from == sp_player
 }
 
 ! /help/ &&
@@ -391,7 +400,7 @@ FROM == OWNER &&
 	}
 }
 
-(FROM == sp_owner || FROM == OWNER) &&
+(sp_from == sp_owner || FROM == OWNER) &&
 /^\.endgame$/ {
 	if (sp_state == "new") {
 		reply("There is no game in progress.")
@@ -408,13 +417,15 @@ FROM == OWNER &&
 	else if (sp_state == "play") {
 		reply("The game has already started")
 	}
-	else if (sp_state == "join" && FROM in sp_players) {
+	else if (sp_state == "join" && sp_from in sp_players) {
 		reply("You are already playing")
 	}
 	else if (sp_state == "join") {
 		i = sp_next()
-		sp_order[i] = FROM
 		sp_players[FROM] = i
+		if (AUTH)
+			sp_cloaks[AUTH] = FROM
+		sp_order[i] = FROM
 		say(FROM " joins the game!")
 	}
 	if (sp_state == "join" && sp_turn == 0)
@@ -424,7 +435,7 @@ FROM == OWNER &&
 !sp_valid &&
 (sp_state "bid" || sp_state == "play") &&
 /^\.(bid|play)\>/ {
-	if (FROM in sp_players)
+	if (sp_from in sp_players)
 		say(".slap " FROM ", it is not your turn.")
 	else
 		say(".slap " FROM ", you are not playing.")
@@ -468,34 +479,38 @@ sp_state == "bid" &&
 
 sp_state == "pass" &&
 /^\.pass (\S+)$/ {
-	card = $2
-	team = sp_players[FROM] % 2
-	if (!(FROM in sp_players)) {
+	_card = $2
+	_team = sp_from in sp_players ? sp_players[sp_from] % 2 : 0
+
+	# check validity and pass
+	if (!(sp_from in sp_players)) {
 		say(".slap " FROM ", you are not playing.")
 	}
-	else if (sp_nil[team] != 2 && sp_nil[team+2] != 2) {
+	else if (sp_nil[_team] != 2 && sp_nil[_team+2] != 2) {
 		reply("Your team did not go blind")
 	}
-	else if (sp_pass[sp_players[FROM]]) {
+	else if (sp_pass[sp_players[sp_from]]) {
 		reply("You have already passed a card")
 	}
-	else if (!(card in sp_deck)) {
+	else if (!(_card in sp_deck)) {
 		reply("Invalid card")
 	}
-	else if (!(card in sp_hands[FROM])) {
+	else if (!(_card in sp_hands[sp_from])) {
 		reply("You do not have that card")
 	}
 	else {
-		sp_pass[sp_players[FROM]] = $2
+		sp_pass[sp_players[sp_from]] = $2
 		say(sp_channel, FROM " passes a card")
 	}
+
+	# check for end of passing
 	if (((sp_nil[0] != 2 && sp_nil[2] != 2) || (sp_pass[0] && sp_pass[2])) &&
 	    ((sp_nil[1] != 2 && sp_nil[3] != 2) || (sp_pass[1] && sp_pass[3]))) {
 		for (i in sp_pass) {
-			partner = (i+2)%4
-			card    = sp_pass[i]
-			delete sp_hands[sp_order[i]][card]
-			sp_hands[sp_order[partner]][card] = 1
+			_partner = (i+2)%4
+			_card    = sp_pass[i]
+			delete sp_hands[sp_order[i]][_card]
+			sp_hands[sp_order[_partner]][_card] = 1
 		}
 		say(sp_channel, "Cards have been passed, play starts with " sp_player "!")
 		for (p in sp_players)
@@ -506,11 +521,11 @@ sp_state == "pass" &&
 
 sp_state ~ "(play|bid)" &&
 /^\.look$/ {
-	if (!(FROM in sp_players)) {
+	if (!(sp_from in sp_players)) {
 		say(".slap " FROM ", you are not playing.")
 	} else {
-		sp_looked[sp_players[FROM]] = 1
-		say(FROM, "You have: " sp_hand(FROM))
+		sp_looked[sp_players[sp_from]] = 1
+		say(FROM, "You have: " sp_hand(sp_from))
 	}
 }
 
@@ -521,23 +536,23 @@ sp_state == "play" &&
 	if (!(card in sp_deck)) {
 		reply("Invalid card")
 	}
-	else if (!(card in sp_hands[FROM])) {
+	else if (!(card in sp_hands[sp_from])) {
 		reply("You do not have that card")
 	}
-	else if (sp_suit && card !~ sp_suit && sp_hasa(FROM, sp_suit)) {
+	else if (sp_suit && card !~ sp_suit && sp_hasa(sp_from, sp_suit)) {
 		reply("You must follow suit (" sp_suit ")")
 	}
-	else if (card ~ /s/ && length(sp_hands[FROM]) == 13 && sp_hasa(FROM, "[^s]$")) {
+	else if (card ~ /s/ && length(sp_hands[sp_from]) == 13 && sp_hasa(sp_from, "[^s]$")) {
 		reply("You cannot trump on the first hand")
 	}
-	else if (card ~ /s/ && length(sp_pile) == 0 && sp_hasa(FROM, "[^s]$") && !sp_broken) {
+	else if (card ~ /s/ && length(sp_pile) == 0 && sp_hasa(sp_from, "[^s]$") && !sp_broken) {
 		reply("Spades have not been broken")
 	}
 	else {
 		sp_play(card)
 		if (sp_state == "play") {
-			if (length(sp_hands[FROM]))
-				say(FROM, "You have: " sp_hand(FROM))
+			if (length(sp_hands[sp_from]))
+				say(FROM, "You have: " sp_hand(sp_from))
 			if (sp_piles)
 				say(sp_player ": it is your turn! " \
 				    "(" sp_pretty(sp_piles, sp_player) ")")

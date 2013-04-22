@@ -139,8 +139,9 @@ function reload() {
 	ARG = arr[8]
 	MSG = arr[10]
 
-	match(SRC, /([^! ]+)!/, arr);
+	match(SRC, /([^! ]+)!([^@ ]+)@([^ ]+\/[^ ]+)?/, arr);
 	FROM = arr[1]
+	AUTH = arr[3]
 
 	match(MSG, /(([^ :,]*)[:,] *)?(.*)/, arr);
 	TO  = arr[2]
