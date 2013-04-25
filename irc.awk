@@ -47,7 +47,7 @@ function set(i) {
 }
 
 # Functions
-function connect(server, nick, channel) {
+function connect(server, nick, channel, auth, pass) {
 	SERVER  = server
 	NICK    = nick
 	CHANNEL = channel
@@ -59,6 +59,7 @@ function connect(server, nick, channel) {
 		send("CAP REQ :account-notify")
 		send("CAP REQ :extended-join")
 		send("CAP END")
+		say("NickServ", "IDENTIFY " pass)
 	} else {
 		send("WHOIS " nick)
 	}

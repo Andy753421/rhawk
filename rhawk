@@ -7,9 +7,19 @@
 
 # Initialization
 BEGIN {
-	OWNER = "andy753421"
-	connect("localhost", "rhawk", "#rhtest");
+	json_load("var/login.json", login);
 	json_load("var/plain.json", plain);
+
+	OWNER = login["owner"];
+
+	connect(login["server"],  \
+	        login["nick"],    \
+	        login["channel"], \
+	        login["auth"],    \
+	        login["pass"])
+
+	delete login
+
 	if (FIRST) {
 		join("#rhnoise")
 		join("#rhspades")
