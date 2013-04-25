@@ -21,8 +21,6 @@
 function send(msg) {
 	print "  > " msg > "/dev/stderr"
 	print msg
-	if (!DEBUG)
-		system("sleep 1")
 	fflush()
 }
 
@@ -72,6 +70,8 @@ function say(to, msg) {
 			to = CHANNEL
 	}
 	send("PRIVMSG " to " :" msg)
+	if (!DEBUG && NR > 1)
+		system("sleep 1")
 }
 
 function action(to, msg)
