@@ -107,8 +107,8 @@ BEGIN { pollchan = "#sfvlug" }
 	_web_ptrn = "next meeting.*" _day "\\w+[, ]+([A-Z]\\w+) +([0-9]+)[, ]+([0-9]+)"
 	_irc_ptrn = _day "\\w*[, ]+([A-Z]\\w+) +([0-9]+)"
 	while (_curl | getline _line) {
-		if (match(_line, _web_tba))
-			email("Brian <brian@zimage.com>");
+		#if (match(_line, _web_tba))
+		#	email("Brian <brian@zimage.com>");
 		if (match(_line, _web_ptrn, _parts)) {
 			_date  = _parts[1] " " _parts[2] " " _parts[3]
 			_topic = topics[pollchan]
@@ -201,6 +201,7 @@ TO == NICK && DST ~ /^#/ {
 
 #DST != "#sfvlug" &&
 !(FROM in bots) &&
+CMD == "PRIVMSG" &&
 MSG !~ /^\./ &&
 /awk/ {
 	say("Awk, awk, awk! I'm a bird!")

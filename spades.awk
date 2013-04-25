@@ -331,8 +331,8 @@ BEGIN {
 	sp_init()
 	sp_reset(2)
 	sp_load("var/sp_cur.json");
-	if (sp_channel)
-		say(sp_channel, "Game restored.")
+	#if (sp_channel)
+	#	say(sp_channel, "Game restored.")
 }
 
 // {
@@ -340,6 +340,7 @@ BEGIN {
 	sp_valid = sp_from && sp_from == sp_player
 }
 
+CMD == "PRIVMSG" &&
 ! /help/ &&
 /[Ss]pades/ {
 	say("Spades! " sp_pretty("As,Ah,Ad,Ac", FROM))
