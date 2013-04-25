@@ -52,7 +52,7 @@ function sp_reset(type)
 		sp_limit    = 10    #     Bag out limit
 		delete sp_hands     # [p] Each players cards
 		delete sp_players   # [p] Player names players["name"] -> i
-		delete sp_cloaks    # [c] Player cloaks cloaks["cloak"] -> "name"
+		delete sp_auths     # [c] Player auth names auths["auth"] -> "name"
 		delete sp_order     # [i] Player order order[i] -> "name"
 		delete sp_scores    # [i] Teams score
 	}
@@ -91,7 +91,7 @@ function sp_save(file,	game)
 	game["limit"]   = sp_limit;
 	json_copy(game, "hands",   sp_hands);
 	json_copy(game, "players", sp_players);
-	json_copy(game, "cloaks",  sp_cloaks);
+	json_copy(game, "auths",   sp_auths);
 	json_copy(game, "order",   sp_order);
 	json_copy(game, "scores",  sp_scores);
 
@@ -128,7 +128,7 @@ function sp_load(file,	game)
 	sp_limit   = game["limit"];
 	sp_acopy(sp_hands,   game["hands"]);
 	sp_acopy(sp_players, game["players"]);
-	sp_acopy(sp_cloaks,  game["cloaks"]);
+	sp_acopy(sp_auths,   game["auths"]);
 	sp_acopy(sp_order,   game["order"]);
 	sp_acopy(sp_scores,  game["scores"]);
 }
@@ -336,7 +336,7 @@ BEGIN {
 }
 
 // {
-	sp_from  = AUTH in sp_cloaks ? sp_cloaks[AUTH] : FROM
+	sp_from  = AUTH in sp_auths ? sp_auths[AUTH] : FROM
 	sp_valid = sp_from && sp_from == sp_player
 }
 
@@ -425,7 +425,7 @@ FROM == OWNER &&
 		i = sp_next()
 		sp_players[FROM] = i
 		if (AUTH)
-			sp_cloaks[AUTH] = FROM
+			sp_auths[AUTH] = FROM
 		sp_order[i] = FROM
 		say(FROM " joins the game!")
 	}
