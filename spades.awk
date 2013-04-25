@@ -346,13 +346,13 @@ CMD == "PRIVMSG" &&
 	say("Spades! " sp_pretty("As,Ah,Ad,Ac", FROM))
 }
 
-FROM == OWNER &&
+AUTH == OWNER &&
 /^\.savegame/ {
 	sp_save("var/sp_save.json");
 	say("Game saved.")
 }
 
-FROM == OWNER &&
+AUTH == OWNER &&
 /^\.loadgame/ {
 	sp_load("var/sp_save.json");
 	say("Game loaded.")
@@ -377,7 +377,7 @@ FROM == OWNER &&
 }
 
 # Debugging
-FROM == OWNER &&
+AUTH == OWNER &&
 /^\.deal (\w+) (.*)/ {
 	delete sp_hands[$2]
 	for (i=3; i<=NF; i++)
@@ -401,7 +401,7 @@ FROM == OWNER &&
 	}
 }
 
-(sp_from == sp_owner || FROM == OWNER) &&
+(sp_from == sp_owner || AUTH == OWNER) &&
 /^\.endgame$/ {
 	if (sp_state == "new") {
 		reply("There is no game in progress.")

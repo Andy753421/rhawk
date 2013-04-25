@@ -28,23 +28,23 @@ BEGIN {
 }
 
 # Admin
-FROM == OWNER && TO == NICK && /^die in a fire/ {
+AUTH == OWNER && TO == NICK && /^die in a fire/ {
 	say("Ack, argh, barasdjf..")
 	quit()
 }
 
-FROM == OWNER && TO == NICK && /^reload/ {
+AUTH == OWNER && TO == NICK && /^reload/ {
 	say("Reloading..")
 	reload()
 }
 
-FROM == OWNER && TO == NICK && /^rejoin/ {
+AUTH == OWNER && TO == NICK && /^rejoin/ {
 	reply("joining..")
 	join("#rhnoise")
 	next
 }
 
-FROM == OWNER && TO == NICK && /^(join|part)/ {
+AUTH == OWNER && TO == NICK && /^(join|part)/ {
 	match(MSG, /(join|part) +(#+\w+)/, arr)
 	if (arr[1] && arr[2]) {
 		send(toupper(arr[1]) " " arr[2]);
@@ -52,7 +52,7 @@ FROM == OWNER && TO == NICK && /^(join|part)/ {
 	}
 }
 
-FROM == OWNER && TO == NICK && /^\.msg/ {
+AUTH == OWNER && TO == NICK && /^\.msg/ {
 	match(MSG, /.*\.msg +(#*\w+) +(.*)/, arr)
 	send("PRIVMSG " arr[1] " :" arr[2])
 }
@@ -175,7 +175,7 @@ TO == NICK && /^\.?fortune/     {
 }
 
 # Noise
-FROM ~ OWNER && /^go go gadget woop/ {
+AUTH == OWNER && /^go go gadget woop/ {
 	for (i=20; i>0; i--)
 		say(".delay " i " seconds; .woop " i)
 }
@@ -298,7 +298,7 @@ FROM == "rhnoise" && load_mod {
 #	delete user_scores
 #}
 #
-#FROM == OWNER && length(user_scores) &&
+#AUTH == OWNER && length(user_scores) &&
 #tolower($0) ~ /\<nuclear launch detected\>/ {
 #	for (_i=1; _i<=length(user_scores); _i++)
 #		say(user_scores[_i]["user"] "--");

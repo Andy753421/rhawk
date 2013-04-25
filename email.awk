@@ -80,7 +80,7 @@ function mail_run(  user, chan, ready, time)
 	}
 }
 
-FROM ~ OWNER &&
+AUTH == OWNER &&
 TO == NICK &&
 /^e?mail .* .*/ {
 	reply("notifying " $2 " for " $3)
@@ -97,7 +97,7 @@ TO == NICK &&
 	mail_enable[_user] = _addr
 }
 
-FROM ~ OWNER &&
+AUTH == OWNER &&
 TO == NICK &&
 /^stfu .*/ {
 	reply("well fine then")
