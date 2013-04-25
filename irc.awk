@@ -179,11 +179,11 @@ CMD == "PING" {
 }
 
 CMD == "332" {
-	CMD = "TOPIC"
+	TOPICS[ARG[2]] = MSG
 }
 
 CMD == "TOPIC" {
-	topics[DST] = MSG
+	TOPICS[ARG[1]] = MSG
 }
 
 # Authentication
@@ -192,6 +192,8 @@ CMD == "319" {
 	gsub(/[@+]/, "")
 	for (i=1; i<=NF; i++)
 		send("WHO " $i " %uhnar")
+	for (i=1; i<=NF; i++)
+		send("TOPIC " $i)
 }
 
 CMD == "ACCOUNT" {

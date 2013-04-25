@@ -103,10 +103,9 @@ function email(to, from, subj, body, sendmail)
 }
 
 BEGIN { pollchan = "#sfvlug" }
-#(CMD == "TOPIC"   && systime()-lastpoll > 60*60*24) ||
 (CMD == "PING"    && systime()-lastpoll > 60*60*24) ||
 (CMD == "PRIVMSG" && /^\.poll/) {
-	if (!topics[pollchan]) {
+	if (!TOPICS[pollchan]) {
 		debug("Unknown topic for " pollchan);
 		send("TOPIC " pollchan)
 		next
@@ -121,10 +120,10 @@ BEGIN { pollchan = "#sfvlug" }
 		#	email("Brian <brian@zimage.com>");
 		if (match(_line, _web_ptrn, _parts)) {
 			_date  = _parts[1] " " _parts[2] " " _parts[3]
-			_topic = topics[pollchan]
+			_topic = TOPICS[pollchan]
 			sub(_irc_ptrn, _date, _topic)
-			if (_topic != topics[pollchan])
-				topic(pollchan, topics[pollchan] = _topic)
+			if (_topic != TOPICS[pollchan])
+				topic(pollchan, TOPICS[pollchan] = _topic)
 			else
 				debug("topic is already correct")
 			break
