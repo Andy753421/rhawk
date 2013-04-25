@@ -56,6 +56,11 @@ function connect(server, nick, channel) {
 		"hostname" | getline _host
 		send("USER " _name " " _host " " server " :" nick)
 		send("NICK " nick)
+		send("CAP REQ :account-notify")
+		send("CAP REQ :extended-join")
+		send("CAP END")
+	} else {
+		send("WHOIS " nick)
 	}
 }
 
@@ -89,6 +94,7 @@ function reply(msg) {
 function join(chan) {
 	send("JOIN " chan)
 	send("TOPIC " chan)
+	send("WHO " chan " %uhnar")
 }
 
 function part(chan) {
@@ -154,6 +160,11 @@ function reload() {
 	if (CMD == "PRIVMSG" && DST == NICK && FROM && !TO)
 		TO = DST
 
+	if (FROM in USERS)
+		AUTH = USERS[FROM]["auth"]
+	else
+		AUTH = ""
+
 	#set()
 }
 
@@ -172,4 +183,47 @@ CMD == "332" {
 
 CMD == "TOPIC" {
 	topics[DST] = MSG
+}
+
+# Authentication
+# todo - netsplits
+CMD == "319" {
+	gsub(/[@+]/, "")
+	for (i=1; i<=NF; i++)
+		send("WHO " $i " %uhnar")
+}
+
+CMD == "ACCOUNT" {
+	_auth = ARG[1] == "*" ? 0 : ARG[1]
+	USERS[FROM]["auth"] = _auth
+}
+
+CMD == "354" {
+	_auth = ARG[5] == "*" ? 0 : ARG[5]
+	USERS[ARG[4]]["user"] = ARG[2]
+	USERS[ARG[4]]["host"] = ARG[3]
+	USERS[ARG[4]]["nick"] = ARG[4]
+	USERS[ARG[4]]["auth"] = _auth
+	USERS[ARG[4]]["real"] = MSG
+}
+
+CMD == "JOIN" {
+	_auth = ARG[2] == "*" ? 0 : ARG[2]
+	USERS[FROM]["user"] = USER
+	USERS[FROM]["host"] = HOST
+	USERS[FROM]["nick"] = FROM
+	USERS[FROM]["auth"] = _auth
+	USERS[FROM]["real"] = MSG
+}
+
+/^\.auth/ {
+	_who = $2 ? $2 : FROM
+	if (_who in USERS)
+		say(" nick=" USERS[_who]["nick"] \
+		    " user=" USERS[_who]["user"] \
+		    " auth=" USERS[_who]["auth"] \
+		    " real=" USERS[_who]["real"] \
+		    " host=" USERS[_who]["host"])
+	else
+		say("no auth info for " _who)
 }
