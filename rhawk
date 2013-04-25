@@ -159,6 +159,19 @@ BEGIN {
 	    "reload: " uptime(_now - up_reload))
 }
 
+# Auth info
+/^\.auth/ {
+	_who = $2 ? $2 : FROM
+	if (_who in USERS)
+		say("nick=" USERS[_who]["nick"] " " \
+		    "user=" USERS[_who]["user"] " " \
+		    "auth=" USERS[_who]["auth"] " " \
+		    "real=" USERS[_who]["real"] " " \
+		    "host=" USERS[_who]["host"])
+	else
+		say("no auth info for " _who)
+}
+
 # Fortune
 TO == NICK && /^/               { extra = ""   }
 TO == NICK && /^\.?fortune.*-o/ { extra = "-o" }

@@ -216,15 +216,3 @@ CMD == "JOIN" {
 	USERS[FROM]["auth"] = _auth
 	USERS[FROM]["real"] = MSG
 }
-
-/^\.auth/ {
-	_who = $2 ? $2 : FROM
-	if (_who in USERS)
-		say(" nick=" USERS[_who]["nick"] \
-		    " user=" USERS[_who]["user"] \
-		    " auth=" USERS[_who]["auth"] \
-		    " real=" USERS[_who]["real"] \
-		    " host=" USERS[_who]["host"])
-	else
-		say("no auth info for " _who)
-}
