@@ -48,7 +48,7 @@ FROM == OWNER && TO == NICK && /^\.msg/ {
 }
 
 # Kick handling
-CMD == "KICK" && ARG == NICK {
+CMD == "KICK" && ARG[2] == NICK {
 	kick_delay = (kick_delay + 2) * 2
 	system("sleep " kick_delay)
 	join(DST)

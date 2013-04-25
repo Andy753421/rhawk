@@ -36,15 +36,16 @@ function debug(msg) {
 	fflush()
 }
 
-function set() {
+function set(i) {
 	debug("CMD:  [" CMD  "]")
 	debug("SRC:  [" SRC  "]")
 	debug("DST:  [" DST  "]")
 	debug("FROM: [" FROM "]")
 	debug("TO:   [" TO   "]")
-	debug("ARG:  [" ARG  "]")
 	debug("MSG:  [" MSG  "]")
 	debug("$0:   [" $0   "]")
+	for (i in ARG)
+		debug("ARG"i": [" ARG[i] "]")
 }
 
 # Functions
@@ -132,16 +133,19 @@ function reload() {
 	gsub(/\s+/,     " ")
 	gsub(/^ | $/,    "")
 	gsub(/\3[0-9]*/, "")
-	match($0, /(:([^ ]+) +)?(([A-Z0-9]+) +)(([^ ]+) +)?(([^: ]+) +)?(:(.*))/, arr);
+	match($0, /(:([^ ]+) )?([A-Z0-9]+)(( [^:][^ ]*)*)( :(.*))?/, arr);
+	sub(/^ /, "", arr[4])
 	SRC = arr[2]
-	CMD = arr[4]
-	DST = arr[6]
-	ARG = arr[8]
-	MSG = arr[10]
+	CMD = arr[3]
+	MSG = arr[7]
+
+	split(arr[4], ARG)
+	DST = ARG[1]
 
 	match(SRC, /([^! ]+)!([^@ ]+)@([^ ]+\/[^ ]+)?/, arr);
 	FROM = arr[1]
-	AUTH = arr[3]
+	USER = arr[2]
+	HOST = arr[3]
 
 	match(MSG, /(([^ :,]*)[:,] *)?(.*)/, arr);
 	TO  = arr[2]
@@ -164,7 +168,6 @@ CMD == "PING" {
 
 CMD == "332" {
 	CMD = "TOPIC"
-	DST = ARG
 }
 
 CMD == "TOPIC" {
