@@ -45,9 +45,9 @@ AUTH == OWNER && TO == NICK && /^rejoin/ {
 }
 
 AUTH == OWNER && TO == NICK && /^(join|part)/ {
-	match(MSG, /(join|part) +(#+\w+)/, arr)
-	if (arr[1] && arr[2]) {
-		send(toupper(arr[1]) " " arr[2]);
+	if (match(MSG, /(join|part) +(#+\w+)/, arr)) {
+		if (arr[1] == "join") join(arr[2]);
+		if (arr[1] == "part") part(arr[2]);
 		next
 	}
 }
