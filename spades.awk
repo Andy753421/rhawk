@@ -168,13 +168,13 @@ function sp_deal(	shuf)
 	say("Bidding starts with " sp_player "!")
 }
 
-function sp_hand(who,	sort, str)
+function sp_hand(to, who,	sort, str)
 {
 	asorti(sp_hands[who], sort, "sp_csort")
 	for (i=0; i<length(sort); i++)
 		str = str "" sprintf("%4s", sort[i])
 	gsub(/^ +| +$/, "", str)
-	return sp_pretty(str, who)
+	return sp_pretty(str, to)
 }
 
 function sp_hasa(who, expr)
@@ -463,7 +463,7 @@ sp_state == "bid" &&
 			say("Bidding goes to " sp_player "!")
 		} else {
 			for (p in sp_players)
-				say(p, "You have: " sp_hand(p))
+				say(p, "You have: " sp_hand(p, p))
 			sp_state = "play"
 			for (i=0; i<2; i++) {
 				if (sp_nil[i] == 2 || sp_nil[i+2] == 2) {
@@ -515,7 +515,7 @@ sp_state == "pass" &&
 		}
 		say(sp_channel, "Cards have been passed, play starts with " sp_player "!")
 		for (p in sp_players)
-			say(p, "You have: " sp_hand(p))
+			say(p, "You have: " sp_hand(p, p))
 		sp_state = "play"
 	}
 }
@@ -526,7 +526,7 @@ sp_state ~ "(play|bid)" &&
 		say(".slap " FROM ", you are not playing.")
 	} else {
 		sp_looked[sp_players[sp_from]] = 1
-		say(FROM, "You have: " sp_hand(sp_from))
+		say(FROM, "You have: " sp_hand(FROM, sp_from))
 	}
 }
 
@@ -553,7 +553,7 @@ sp_state == "play" &&
 		sp_play(card)
 		if (sp_state == "play") {
 			if (length(sp_hands[sp_from]))
-				say(FROM, "You have: " sp_hand(sp_from))
+				say(FROM, "You have: " sp_hand(FROM, sp_from))
 			if (sp_piles)
 				say(sp_player ": it is your turn! " \
 				    "(" sp_pretty(sp_piles, sp_player) ")")
