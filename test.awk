@@ -1,7 +1,7 @@
 # Functions
 function say(who, msg)
 {
-	print ":" who "! PRIVMSG #rhtest :" msg
+	print ":" who"!u@h PRIVMSG #rhtest :" msg
 }
 
 function error(msg)
