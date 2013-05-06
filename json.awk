@@ -262,6 +262,7 @@ function json_load(file, var,   line, text, tokens, data, key)
 		return data[0]
 	for (key in data[0])
 		json_copy(var, key, data[0][key])
+	return 1
 }
 
 function json_save(file, var,   cmd, tmp)

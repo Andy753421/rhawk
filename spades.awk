@@ -102,7 +102,8 @@ function sp_save(file,	game)
 function sp_load(file,	game)
 {
 	# Load
-	json_load(file, game);
+	if (!json_load(file, game))
+		return
 
 	# Per hand
 	sp_suit    = game["suit"];
