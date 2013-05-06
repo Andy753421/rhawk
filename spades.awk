@@ -17,7 +17,7 @@ function sp_init(cards, tmp0, tmp1)
 function sp_reset(type)
 {
 	# Per message
-	if (type >= 0) {
+	if (type <  0) {
 		sp_from     = ""    #    The speakers player name
 		sp_valid    = ""    #    It is the speaker turn
 	}
