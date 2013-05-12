@@ -186,6 +186,77 @@ TO == NICK && /^\.?fortune/     {
 	next
 }
 
+# Morse code
+BEGIN {
+	morse["/"      ] = " "
+	morse[".-.-.-" ] = "."
+	morse["--..--" ] = ","
+	morse["..--.." ] = "?"
+	morse[".----." ] = "'"
+	morse["-.-.--" ] = "!"
+	morse["-..-."  ] = "/"
+	morse["-.--."  ] = "("
+	morse["-.--.-" ] = ")"
+	morse[".-..."  ] = "&"
+	morse["---..." ] = ":"
+	morse["-.-.-." ] = ";"
+	morse["-...-"  ] = "="
+	morse[".-.-."  ] = "+"
+	morse["-....-" ] = "-"
+	morse["..--.-" ] = "_"
+	morse[".-..-." ] = "\""
+	morse["...-..-"] = "$"
+	morse[".--.-." ] = "@"
+	morse[".-"     ] = "a"
+	morse["-..."   ] = "b"
+	morse["-.-."   ] = "c"
+	morse["-.."    ] = "d"
+	morse["."      ] = "e"
+	morse["..-."   ] = "f"
+	morse["--."    ] = "g"
+	morse["...."   ] = "h"
+	morse[".."     ] = "i"
+	morse[".---"   ] = "j"
+	morse["-.-"    ] = "k"
+	morse[".-.."   ] = "l"
+	morse["--"     ] = "m"
+	morse["-."     ] = "n"
+	morse["---"    ] = "o"
+	morse[".--."   ] = "p"
+	morse["--.-"   ] = "q"
+	morse[".-."    ] = "r"
+	morse["..."    ] = "s"
+	morse["-"      ] = "t"
+	morse["..-"    ] = "u"
+	morse["...-"   ] = "v"
+	morse[".--"    ] = "w"
+	morse["-..-"   ] = "x"
+	morse["-.--"   ] = "y"
+	morse["--.."   ] = "z"
+	morse["-----"  ] = "0"
+	morse[".----"  ] = "1"
+	morse["..---"  ] = "2"
+	morse["...--"  ] = "3"
+	morse["....-"  ] = "4"
+	morse["....."  ] = "5"
+	morse["-...."  ] = "6"
+	morse["--..."  ] = "7"
+	morse["---.."  ] = "8"
+	morse["----."  ] = "9"
+}
+
+/^\.morse/ {
+	gsub(/[^.\-\/]/, " ")
+	_str = ""
+	for (i=2; i<=NF; i++)
+		if ($i in morse)
+			_str = _str morse[$i]
+	if (_str)
+		reply(_str)
+	else
+		reply("hush it, you pile of bologna")
+}
+
 # Noise
 AUTH == OWNER && /^go go gadget woop/ {
 	for (i=20; i>0; i--)
