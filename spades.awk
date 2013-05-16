@@ -604,6 +604,9 @@ sp_state == "play" &&
 		    sp_order[2] " " sp_order[3])
 	}
 	if (sp_state == "bid" || sp_state == "play") {
+		say("playing to: " \
+		    sp_playto " points, " \
+		    sp_limit  " bags")
 		say(sp_team(0) ": " \
 		    int(sp_scores[0]) " points, " \
 		    int(sp_bags(0))   " bags")
