@@ -218,3 +218,12 @@ CMD == "JOIN" {
 	USERS[FROM]["auth"] = _auth
 	USERS[FROM]["real"] = MSG
 }
+
+CMD == "NICK" {
+	USERS[MSG]["user"] = USERS[FROM]["user"]
+	USERS[MSG]["host"] = USERS[FROM]["host"]
+	USERS[MSG]["nick"] = MSG
+	USERS[MSG]["auth"] = USERS[FROM]["auth"]
+	USERS[MSG]["real"] = USERS[FROM]["real"]
+	delete USERS[FROM]
+}
