@@ -521,7 +521,7 @@ sp_state == "pass" &&
 	}
 }
 
-sp_state ~ "(play|bid)" &&
+sp_state ~ "(bid|pass|play)" &&
 /^\.look$/ {
 	if (!(sp_from in sp_players)) {
 		say(".slap " FROM ", you are not playing.")
