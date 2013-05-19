@@ -136,9 +136,11 @@ function sp_load(file,	game)
 
 function sp_pretty(cards, who)
 {
-	if (!plain[who]) {
+	if (!nocolor[who]) {
 		gsub(/[0-9JQKA]*[sc]/, "\0031,00\002&\017", cards) # black
 		gsub(/[0-9JQKA]*[hd]/, "\0034,00\002&\017", cards) # red
+	}
+	if (!nounicode[who]) {
 		gsub(/s/, "\002♠", cards)
 		gsub(/h/, "\002♥", cards)
 		gsub(/d/, "\002♦", cards)

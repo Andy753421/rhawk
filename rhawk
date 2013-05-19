@@ -7,8 +7,9 @@
 
 # Initialization
 BEGIN {
-	json_load("var/login.json", login);
-	json_load("var/plain.json", plain);
+	json_load("var/login.json",     login);
+	json_load("var/nounicode.json", nounicode);
+	json_load("var/nocolor.json",   nocolors);
 
 	OWNER = login["owner"];
 
@@ -75,15 +76,25 @@ CMD == "NICK" && FROM in bots {
 }
 
 
-# Unicode
+# Fancy output
 /[Uu]nicode :-?\(/ {
-	plain[FROM] = 1
-	json_save("var/plain.json", plain);
+	nounicode[FROM] = 1
+	json_save("var/nounicode.json", nounicode);
 }
 
 /[Uu]nicode :-?\)/ {
-	delete plain[FROM]
-	json_save("var/plain.json", plain);
+	delete nounicode[FROM]
+	json_save("var/nounicode.json", nounicode);
+}
+
+/[Cc]olors :-?\(/ {
+	nocolor[FROM] = 1
+	json_save("var/nocolor.json", nocolor);
+}
+
+/[Cc]olors :-?\)/ {
+	delete nocolor[FROM]
+	json_save("var/nocolor.json", nocolor);
 }
 
 # SFV Lug
