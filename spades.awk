@@ -229,10 +229,15 @@ function sp_bidders(	i, turn, bid, bids)
 {
 	for (i = 0; i < 4; i++) {
 		turn = (sp_dealer + i) % 4
-		if (sp_bids[turn] && !sp_nil[turn]) {
+		if (sp_bids[turn] && !sp_nil[turn])
 			bid  = sp_order[turn] ":" sp_bids[turn]
-			bids = bids " " bid
-		}
+		else if (sp_nil[turn] == 1)
+			bid  = sp_order[turn] ":" "nil"
+		else if (sp_nil[turn] == 2)
+			bid  = sp_order[turn] ":" "blind"
+		else
+			continue
+		bids = bids " " bid
 	}
 	gsub(/^ +| +$/, "", bids)
 	return bids
