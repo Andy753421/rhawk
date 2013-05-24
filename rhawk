@@ -374,29 +374,41 @@ FROM == "rhnoise" && load_mod {
 }
 
 # Decrementer
-#BEGIN {
-#	user_scores[0] = 1
-#}
-#
-#FROM == "rhnoise" && !length(user_scores) {
-#	if (split(MSG, _parts, /, /)) {
-#		for (_i=1; _i<=length(_parts); _i++) {
-#			split(_parts[_i], _tmp, ": ");
-#			user_scores[_i]["user"]  = _tmp[1];
-#			user_scores[_i]["score"] = _tmp[2];
-#		}
-#	}
-#}
-#
-#FROM == "rhnoise" && /^User Scores:$/ {
-#	delete user_scores
-#}
-#
-#AUTH == OWNER && length(user_scores) &&
-#tolower($0) ~ /\<nuclear launch detected\>/ {
-#	for (_i=1; _i<=length(user_scores); _i++)
-#		say(user_scores[_i]["user"] "--");
-#}
+BEGIN {
+	user_scores[0] = 1;
+}
+
+/^\.(scores|scoreboard)$/ {
+	delete user_scores
+}
+
+FROM == "rhnoise" && !length(user_scores) {
+	if (split(MSG, _parts, /, /)) {
+		for (_i=1; _i<=length(_parts); _i++) {
+			split(_parts[_i], _tmp, ": ");
+			user_scores[_i]["user"]  = _tmp[1];
+			user_scores[_i]["score"] = _tmp[2];
+		}
+	}
+}
+
+length(user_scores) &&
+tolower($0) ~ /\<nuclear launch detected\>/ {
+	_count = 0;
+	for (_i=1; _i<=length(user_scores); _i++) {
+		_user  = user_scores[_i]["user"];
+		_score = user_scores[_i]["score"];
+		if (_user in USERS) continue
+		if (_score ==  1) { say(_user "--"); _count++; }
+		if (_score == -1) { say(_user "++"); _count++; }
+	}
+	if (_count) {
+		delete user_scores;
+		say(".scores");
+	} else {
+		say("looks like you're safe.. for now..");
+	}
+}
 
 # Misc
 { fflush("") }
