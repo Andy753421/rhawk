@@ -245,15 +245,16 @@ function sp_bidders(	i, turn, bid, bids)
 	return bids
 }
 
-function sp_score(	bids, tricks)
+function sp_score(	bids, times, tricks)
 {
 	for (i=0; i<2; i++) {
 		bids   = sp_bids[i]   + sp_bids[i+2]
 		tricks = sp_tricks[i] + sp_tricks[i+2]
 		bags   = tricks - bids
-		if (sp_bags(i) + bags >= sp_limit) {
-			say(sp_team(i) " bag out")
-			sp_scores[i] -= sp_limit * 10
+		times  = int((sp_bags(i) + bags) / sp_limit)
+		if (times > 0) {
+			say(sp_team(i) " bag" (times>1?" way ":" ") "out")
+			sp_scores[i] -= sp_limit * 10 * times;
 		}
 		if (tricks >= bids) {
 			say(sp_team(i) " make their bid: " tricks "/" bids)
