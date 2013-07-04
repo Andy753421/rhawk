@@ -571,7 +571,7 @@ sp_state == "play" &&
 	}
 }
 
-/^\.bids$/ && sp_state == "play" {
+/^\.bids$/ && sp_state ~ "(pass|play)" {
 	say(sp_order[0] " bid " sp_bids[0] ", " \
 	    sp_order[2] " bid " sp_bids[2] ", " \
 	    "total: " sp_bids[0] + sp_bids[2])
@@ -587,7 +587,7 @@ sp_state == "play" &&
 	    sp_order[3] " took " int(sp_tricks[3]) "/" int(sp_bids[3]))
 }
 
-/^\.turn/ && sp_state ~ "(play|bid)" {
+/^\.turn/ && sp_state ~ "(bid|pass|play)" {
 	_bids = sp_bidders()
 	_pile = sp_pretty(sp_piles, FROM)
 	if (sp_state == "bid" && !_bids)
@@ -598,6 +598,9 @@ sp_state == "play" &&
 		say("It is " sp_player "'s turn!")
 	if (sp_state == "play" && _pile)
 		say("It is " sp_player "'s turn! (" _pile ")")
+	for (_i=0; sp_state == "pass" && _i<4; _i++)
+		if ((sp_nil[_i%2+0]==2 || sp_nil[_i%2+2]==2) && !sp_pass[_i])
+			say("Waiting for " sp_order[_i] " to pass a card!")
 }
 
 (TO == NICK || DST == sp_channel) &&
@@ -610,8 +613,8 @@ sp_state == "play" &&
 		    sp_order[0] " " sp_order[1] " " \
 		    sp_order[2] " " sp_order[3])
 	}
-	if (sp_state == "bid" || sp_state == "play") {
-		say("playing to: " \
+	if (sp_state ~ "bid|pass|play") {
+		say("Playing to: " \
 		    sp_playto " points, " \
 		    sp_limit  " bags")
 		say(sp_team(0) ": " \
