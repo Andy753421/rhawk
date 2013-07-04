@@ -388,10 +388,20 @@ AUTH == OWNER &&
 # Debugging
 AUTH == OWNER &&
 /^\.deal (\w+) (.*)/ {
+	say(sp_channel, FROM " is cheating for " $2)
 	delete sp_hands[$2]
 	for (i=3; i<=NF; i++)
 		sp_hands[$2][$i] = 1
+	next
+}
+
+AUTH == OWNER &&
+sp_state == "play" &&
+/^\.play (\w+) (\S+)$/ {
 	say(sp_channel, FROM " is cheating for " $2)
+	sp_from = $2
+	sp_play($3)
+	next
 }
 
 
@@ -542,24 +552,24 @@ sp_state ~ "(bid|pass|play)" &&
 sp_valid &&
 sp_state == "play" &&
 /^\.play (\S+)$/ {
-	card = $2
-	if (!(card in sp_deck)) {
+	_card = $2
+	if (!(_card in sp_deck)) {
 		reply("Invalid card")
 	}
-	else if (!(card in sp_hands[sp_from])) {
+	else if (!(_card in sp_hands[sp_from])) {
 		reply("You do not have that card")
 	}
-	else if (sp_suit && card !~ sp_suit && sp_hasa(sp_from, sp_suit)) {
+	else if (sp_suit && _card !~ sp_suit && sp_hasa(sp_from, sp_suit)) {
 		reply("You must follow suit (" sp_suit ")")
 	}
-	else if (card ~ /s/ && length(sp_hands[sp_from]) == 13 && sp_hasa(sp_from, "[^s]$")) {
+	else if (_card ~ /s/ && length(sp_hands[sp_from]) == 13 && sp_hasa(sp_from, "[^s]$")) {
 		reply("You cannot trump on the first hand")
 	}
-	else if (card ~ /s/ && length(sp_pile) == 0 && sp_hasa(sp_from, "[^s]$") && !sp_broken) {
+	else if (_card ~ /s/ && length(sp_pile) == 0 && sp_hasa(sp_from, "[^s]$") && !sp_broken) {
 		reply("Spades have not been broken")
 	}
 	else {
-		sp_play(card)
+		sp_play(_card)
 		if (sp_state == "play") {
 			if (length(sp_hands[sp_from]))
 				say(FROM, "You have: " sp_hand(FROM, sp_from))
