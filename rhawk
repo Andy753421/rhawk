@@ -145,6 +145,11 @@ BEGIN { pollchan = "#sfvlug" }
 }
 
 # Versin/Uptime
+function head(cmd, var) {
+	cmd | getline var
+	close(cmd)
+	return var
+}
 function uptime(time,  fmt) {
 	fmt = "%d:%02d:%02d:%02d"
 	fmt = "%d days %02d:%02d:%02d"
@@ -155,13 +160,13 @@ function uptime(time,  fmt) {
 		time / (1       ) % 60)
 }
 BEGIN {
-	_cmd = "git describe --always --dirty";
-	_cmd | getline up_version;
-	close(_cmd);
-	up_reload = systime();
+	up_version = head("git describe --always --dirty")
+	up_author  = head("git log -n1 --format=format:%an")
+	up_message = head("git log -n1 --format=format:%s")
+	up_reload  = systime();
 }
-/^\.version/ {
-	say("version: " up_version)
+/^\.(version|rev)/ {
+	say("version: " up_version " - " up_author " - " up_message)
 }
 /^\.uptime/ {
 	_now = systime();
