@@ -410,13 +410,13 @@ sp_state == "play" &&
 	if (sp_state != "new") {
 		reply("There is already a game in progress.")
 	} else {
+		$1         = ".join"
 		sp_owner   = FROM
 		sp_playto  = $2 ? $2 : 200
 		sp_limit   = sp_playto > 200 ? 10 : 5;
 		sp_state   = "join"
 		sp_channel = DST
 		say(sp_owner " starts a game of Spades to " sp_playto " with " sp_limit " bags!")
-		#say("#rhnoise", sp_owner " starts a game of Spades in " DST "!")
 	}
 }
 
