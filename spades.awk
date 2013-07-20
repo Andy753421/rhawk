@@ -313,12 +313,10 @@ function sp_play(card,	winner, pi)
 			say("Game over!")
 			winner = sp_scores[0] > sp_scores[1] ? 0 : 1
 			looser = !winner
-			say(sp_team(winner) " wins the game " \
+			say(CHANNEL, sp_team(winner) " wins the game " \
 			    sp_scores[winner] " to " sp_scores[looser])
-			say(sp_order[winner+0] "++")
-			say(sp_order[winner+2] "++")
-			say(sp_order[looser+0] "--")
-			say(sp_order[looser+2] "--")
+			say(CHANNEL, sp_order[winner+0] "++")
+			say(CHANNEL, sp_order[winner+2] "++")
 			sp_reset(2)
 
 		} else {
