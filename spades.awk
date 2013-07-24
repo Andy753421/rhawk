@@ -395,7 +395,7 @@ AUTH == OWNER &&
 
 AUTH == OWNER &&
 sp_state == "play" &&
-/^\.play (\w+) (\S+)$/ {
+/^\.force (\w+) (\S+)$/ {
 	say(sp_channel, FROM " is cheating for " $2)
 	sp_from = $2
 	sp_play($3)
@@ -549,8 +549,9 @@ sp_state ~ "(bid|pass|play)" &&
 
 sp_valid &&
 sp_state == "play" &&
-/^\.play (\S+)$/ {
+/^\.play (\S+)/ {
 	_card = $2
+	gsub(/[^A-Za-z0-9]/, "", _card);
 	if (!(_card in sp_deck)) {
 		reply("Invalid card")
 	}
