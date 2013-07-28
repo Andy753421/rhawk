@@ -349,6 +349,15 @@ FROM == "rhnoise" && $2 == "slaps" && $3 == NICK {
 	say("THE LARCH");
 }
 
+/(for what|that for)\?$/ {
+	say("For great justice!");
+}
+
+/\<nazi/ {
+	say("And now it's...");
+	say("Springtime for Hitler and Germany!");
+}
+
 # God damn commands
 FROM == "rhnoise" && load_mod {
 	say(".load " load_mod)
