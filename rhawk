@@ -22,7 +22,7 @@ BEGIN {
 	delete login
 
 	if (FIRST) {
-		join("#rhnoise")
+		join("#rhtest")
 		join("#rhspades")
 		join("#sfvlug")
 	}
