@@ -49,7 +49,7 @@ function sp_reset(type)
 		sp_dealer   =-1     #     Who is dealing this round
 		sp_turn     = 0     #     Index of who's turn it is
 		sp_player   = ""    #     Who's turn it is
-		sp_limit    = 10    #     Bag out limit
+		sp_limit    = 10    #     Bag out limit / nil bonus
 		delete sp_hands     # [p] Each players cards
 		delete sp_players   # [p] Player names players["name"] -> i
 		delete sp_auths     # [c] Player auth names auths["auth"] -> "name"
@@ -273,7 +273,7 @@ function sp_score(	bids, times, tricks)
 		     sp_nil[i] == 2 && !sp_tricks[i] ? "makes blind nil!" :
 		     sp_nil[i] == 2 &&  sp_tricks[i] ? "fails miserably at blind nil!" :
 		                                       "unknown"))
-		sp_scores[i%2] += 100 * sp_nil[i] * \
+		sp_scores[i%2] += sp_limit * 10 * sp_nil[i] * \
 			(sp_tricks[i] == 0 ? 1 : -1)
 	}
 }
