@@ -618,15 +618,17 @@ sp_state == "play" &&
 	if (sp_state == "new") {
 		say("There is no game in progress")
 	}
+	if (sp_state ~ "join|bid|pass|play") {
+		say("Playing to: " \
+		    sp_playto " points, " \
+		    sp_limit  " bags")
+	}
 	if (sp_state == "join") {
 		say("Waiting for players: " \
 		    sp_order[0] " " sp_order[1] " " \
 		    sp_order[2] " " sp_order[3])
 	}
 	if (sp_state ~ "bid|pass|play") {
-		say("Playing to: " \
-		    sp_playto " points, " \
-		    sp_limit  " bags")
 		say(sp_team(0) ": " \
 		    int(sp_scores[0]) " points, " \
 		    int(sp_bags(0))   " bags")
