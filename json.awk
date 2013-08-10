@@ -114,23 +114,28 @@ function json_write_string(string)
 
 
 # Read functions
-function json_tokenize(str, tokens,   i, items, table, type, found)
+function json_tokenize(str, tokens,   i, line, items, table, type, found)
 {
 	table["term"]  = "^[\\[\\]{}:,]"
 	table["str"]   = "^\"[^\"]*\""
 	table["num"]   = "^[+-]?[0-9]+(.[0-9]+)?"
 	table["var"]   = "^(true|false|null)"
-	table["space"] = "^[ \\t\\n]+"
-	i = 0
+	table["space"] = "^[ \\t]+"
+	table["line"]  = "^\n"
+	i = 0;
+	line = 1;
 	while (length(str) > 0) {
 		found = 0
 		for (type in table) {
 			#print "match: str=["str"] type="type" regex=/"table[type]"/"
 			if (match(str, table[type], items) > 0) {
 				#print "       len="RLENGTH" item=["items[0]"]"
+				if (type == "line")
+					line++;
 				if (type == "term")
 					type = items[0]
-				if (type != "space") {
+				if (type != "space" && type != "line") {
+					tokens[i]["line"] = line
 					tokens[i]["type"] = type
 					tokens[i]["text"] = items[0]
 					i++
@@ -141,7 +146,7 @@ function json_tokenize(str, tokens,   i, items, table, type, found)
 			}
 		}
 		if (!found) {
-			debug("error tokenizing")
+			debug("line " line ": error tokenizing")
 			return 0
 		}
 	}
@@ -152,11 +157,12 @@ function json_tokenize(str, tokens,   i, items, table, type, found)
 	#		tokens[i]["type"], tokens[i]["text"]
 }
 
-function json_parse_value(tokens, i, value, key,   type, text)
+function json_parse_value(tokens, i, value, key,   line, type, text)
 {
 	if (!i    ) i = 0;
 	if (!depth) depth = 0
 	depth++
+	line = tokens[i]["line"]
 	type = tokens[i]["type"]
 	text = tokens[i]["text"]
 	#printf "parse %d: i=%-2d type=%-3s text=%s\n", depth, i, type, text
@@ -166,7 +172,7 @@ function json_parse_value(tokens, i, value, key,   type, text)
 		case "str": i = json_parse_string(tokens, i, value, key); break
 		case "num": i = json_parse_number(tokens, i, value, key); break
 		case "var": i = json_parse_var(tokens,    i, value, key); break
-		default:    debug("error: type="type" text="text); return 0
+		default:    debug("line "line": error type="type" text="text); return 0
 	}
 	depth--
 	return i
@@ -199,7 +205,6 @@ function json_parse_object(tokens, i, value, key,   object, k, v)
 
 function json_parse_array(tokens, i, value, key,   array, k, v)
 {
-	#print "parse_array: .."
 	if (tokens[i++]["text"] != "[")
 		return 0;
 
@@ -311,25 +316,25 @@ function json_test_read()
 	json_parse_value(tokens, 0, array, 0)
 	print json_write_value(array[0])
 
-	json = "{ \"first\":  { \"arr\":    [ \"\",             " \
-	       "                              -1,               " \
-	       "                              1.2,              " \
-	       "                              true,             " \
-	       "                              false,            " \
-	       "                              null    ],        " \
-	       "                \"number\": 42,                 " \
-	       "                \"obj\":    { \"A\": \"a!\",    " \
-	       "                              \"B\": \"b!\",    " \
-	       "                              \"C\": \"c!\" },  " \
-	       "                \"str\":    \"hello, world\" }, " \
-	       "  \"second\": { \"arr\":    [ \"zero\",         " \
-	       "                              \"one\",          " \
-	       "                              \"two\" ],        " \
-	       "                \"number\": 42,                 " \
-	       "                \"obj\":    { \"A\": \"a!\",    " \
-	       "                              \"B\": \"b!\",    " \
-	       "                              \"C\": \"c!\" },  " \
-	       "                \"str\":    \"hello, world\" } }"
+	json = "{ \"first\":  { \"arr\":    [ \"\",             \n" \
+	       "                              -1,               \n" \
+	       "                              1.2,              \n" \
+	       "                              true,             \n" \
+	       "                              false,            \n" \
+	       "                              null    ],        \n" \
+	       "                \"number\": 42,                 \n" \
+	       "                \"obj\":    { \"A\": \"a!\",    \n" \
+	       "                              \"B\": \"b!\",    \n" \
+	       "                              \"C\": \"c!\" },  \n" \
+	       "                \"str\":    \"hello, world\" }, \n" \
+	       "  \"second\": { \"arr\":    [ \"zero\",         \n" \
+	       "                              \"one\",          \n" \
+	       "                              \"two\" ],        \n" \
+	       "                \"number\": 42,                 \n" \
+	       "                \"obj\":    { \"A\": \"a!\",    \n" \
+	       "                              \"B\": \"b!\",    \n" \
+	       "                              \"C\": \"c!\" },  \n" \
+	       "                \"str\":    \"hello, world\" } }\n"
 
 	json_tokenize(json, tokens)
 	json_parse_value(tokens, 0, array, 0)
