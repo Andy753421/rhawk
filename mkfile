@@ -6,9 +6,11 @@ test:Q:
 	#awk -f rhawk < testirc.txt
 	#awk -f rhawk < testirc.txt
 	awk -f test.awk test.txt \
-	| awk '-vDEBUG=1' -frhawk 2>&1 \
-	| grep -v '^  >\|USER\|NICK\|CAP\|JOIN\|TOPIC\|WHO\|unicode'
-	#| grep 'points\|bid\|took'
+	| awk '-vDEBUG=1' -frhawk 2>&1 1>/dev/null \
+	| grep -v '^  > \(USER\|NICK\|CAP\|JOIN\|TOPIC\|WHO\)' \
+	| grep -v '^  . .*\(ACCOUNT\|IDENTIFY\|unicode\|colors\)' \
+	| sed  -e 's/^  > PRIVMSG #\w* :/rhawk:\t/' \
+	       -e 's/^  < :\([^!]*\)![^ ]* PRIVMSG #\w* :/\1:\t/ '
 
 test-select:Q: select.so
 	#awk -f select.awk

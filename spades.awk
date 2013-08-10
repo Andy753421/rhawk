@@ -53,6 +53,7 @@ function sp_reset(type)
 		delete sp_hands     # [p] Each players cards
 		delete sp_players   # [p] Player names players["name"] -> i
 		delete sp_auths     # [c] Player auth names auths["auth"] -> "name"
+		delete sp_share     # [c] Player teammates share["friend"] -> "name"
 		delete sp_order     # [i] Player order order[i] -> "name"
 		delete sp_scores    # [i] Teams score
 	}
@@ -92,6 +93,7 @@ function sp_save(file,	game)
 	json_copy(game, "hands",   sp_hands);
 	json_copy(game, "players", sp_players);
 	json_copy(game, "auths",   sp_auths);
+	json_copy(game, "share",   sp_share);
 	json_copy(game, "order",   sp_order);
 	json_copy(game, "scores",  sp_scores);
 
@@ -130,6 +132,7 @@ function sp_load(file,	game)
 	sp_acopy(sp_hands,   game["hands"]);
 	sp_acopy(sp_players, game["players"]);
 	sp_acopy(sp_auths,   game["auths"]);
+	sp_acopy(sp_share,   game["share"]);
 	sp_acopy(sp_order,   game["order"]);
 	sp_acopy(sp_scores,  game["scores"]);
 }
@@ -343,7 +346,8 @@ BEGIN {
 }
 
 // {
-	sp_from  = AUTH in sp_auths ? sp_auths[AUTH] : FROM
+	sp_from  = AUTH in sp_auths ? sp_auths[AUTH] : \
+	           AUTH in sp_share ? sp_share[AUTH] : FROM
 	sp_valid = sp_from && sp_from == sp_player
 }
 
@@ -448,6 +452,57 @@ sp_state == "play" &&
 	}
 	if (sp_state == "join" && sp_turn == 0)
 		sp_deal()
+}
+
+/^\.allow \S+$/ {
+	_who = $2 in USERS ? USERS[$2]["auth"] : ""
+	_str = _who && _who != $2 ? $2 " (" _who ")" : $2
+	if (sp_state ~ "new|join") {
+		reply("The game has not yet started")
+	}
+	else if (!(sp_from in sp_players)) {
+		reply("You are not playing")
+	}
+	else if (!_who) {
+		reply(_str " is not logged in")
+	}
+	else if (_who in sp_players || _who in sp_auths) {
+		reply(_str " is a primary player")
+	}
+	else if (_who in sp_share) {
+		reply(_str " is already playing for " sp_share[_who])
+	}
+	else {
+		reply(_str " can now play for " sp_from)
+		sp_share[_who] = sp_from
+	}
+}
+
+/^\.deny \S+$/ {
+	_who = $2 in USERS ? USERS[$2]["auth"] : $2
+	_str = _who && _who != $2 ? $2 " (" _who ")" : $2
+	if (sp_state ~ "new|join") {
+		reply("The game has not yet started")
+	}
+	else if (!(sp_from in sp_players)) {
+		reply("You are not playing")
+	}
+	else if (_who in sp_players || _who in sp_auths) {
+		reply(_str " is a primary player")
+	}
+	else if (!(_who in sp_share) || sp_share[_who] != sp_from) {
+		reply(_str " is not playing for " sp_from)
+	}
+	else {
+		reply(_str " can no longer play for " sp_from)
+		delete sp_share[_who]
+	}
+}
+
+sp_state ~ "(bid|pass|play)" &&
+/^\.show/ {
+	for (_i in sp_share)
+		say(_i " can play for " sp_share[_i]);
 }
 
 !sp_valid &&

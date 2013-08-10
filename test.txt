@@ -15,11 +15,14 @@
 #   nn   - newgame to n
 #   e    - endgame
 #   j    - join
+#   Y    - allow
+#   N    - deny
+#   S    - show
+#   d    - deal
 #   l    - look
 #   bn   - bid n
 #   s    - score
 #   B    - bids
-#   t    - tricks
 #   t    - tricks
 #   T    - turn
 #   pn   - pass card n
@@ -27,15 +30,34 @@
 #  -card - play but don't add to deck
 #  +card - add to deck but don't play
 
+# Test allow / deny
+#          .- The game has not yet started
+#          |          .- You are not playing
+#          |          |- Is a primary player
+#          |          |- Is not logged in
+#          |          |- Can now playing for
+#          |          |- Is already playing for
+#          |          |      .- You are not playing
+#          |          |      |- Is a primary player
+#          |          |      |- Is not playing for
+#          |          |      |- Can no longer play
+#          |          |      |- Is not playing for
+auth/auth: .        . .      .     . .  .     -As
+nope:      .        . Yauth  Nauth . .  .      .
+a/aa:      n        . Ya     Na    d b1 Yauth +As
+b/bb:      Ynewgame j Ynope  Nnope d b1 .      Ah
+c/cc:      Nnewgame j Yauth  Nauth d b1 .      Ad
+d/dd:      .        j Yauth  Nauth d b1 .      Ac
+
 # Test scoring
-x: s s s s s s s  s  s  s  s  s
-x: B B B B B B B  B  B  B  B  B
-x: t t t t t t t  t  t  t  t  t
-x: T T T T T T T  T  T  T  T  T
-A: n j . . . d b3 .  .  .  As .
-b: . . j . . d .  b3 .  .  Ah .
-c: . . . j . d .  .  b3 .  Ad .
-d: . . . . j d .  .  .  b3 Ac .
+#x: s s s s s s s  s  s  s  s  s
+#x: B B B B B B B  B  B  B  B  B
+#x: t t t t t t t  t  t  t  t  t
+#x: T T T T T T T  T  T  T  T  T
+#A: n j . . . d b3 .  .  .  As .
+#b: . . j . . d .  b3 .  .  Ah .
+#c: . . . j . d .  .  b3 .  Ad .
+#d: . . . . j d .  .  .  b3 Ac .
 
 # Nil/blind
 #a: n j d l b0  .  .    As Ks Qs Js 10s 9s 8s 7s 6s 5s 4s 3s 2s t e
