@@ -183,18 +183,20 @@ function json_parse_object(tokens, i, value, key,   object, k, v)
 	if (tokens[i++]["text"] != "{")
 		return 0;
 
-	do {
-		delete k
-		delete v
-		if (!(i=json_parse_value(tokens, i, k, 0)))
-			return 0
-		if (tokens[i++]["text"] != ":")
-			return 0
-		if (!(i=json_parse_value(tokens, i, v, 0)))
-			return 0
-		json_copy(object, k[0], v[0]) 
-	} while (tokens[i++]["text"] == ",")
-	i--
+	if (tokens[i]["text"] != "}") {
+		do {
+			delete k
+			delete v
+			if (!(i=json_parse_value(tokens, i, k, 0)))
+				return 0
+			if (tokens[i++]["text"] != ":")
+				return 0
+			if (!(i=json_parse_value(tokens, i, v, 0)))
+				return 0
+			json_copy(object, k[0], v[0]) 
+		} while (tokens[i++]["text"] == ",")
+		i--
+	}
 
 	if (tokens[i++]["text"] != "}")
 		return 0;
@@ -208,13 +210,15 @@ function json_parse_array(tokens, i, value, key,   array, k, v)
 	if (tokens[i++]["text"] != "[")
 		return 0;
 
-	do {
-		delete v
-		if (!(i=json_parse_value(tokens, i, v, 0)))
-			return 0
-		json_copy(array, k++, v[0]) 
-	} while (tokens[i++]["text"] == ",")
-	i--
+	if (tokens[i]["text"] != "]") {
+		do {
+			delete v
+			if (!(i=json_parse_value(tokens, i, v, 0)))
+				return 0
+			json_copy(array, k++, v[0]) 
+		} while (tokens[i++]["text"] == ",")
+		i--
+	}
 
 	if (tokens[i++]["text"] != "]")
 		return 0;
@@ -323,6 +327,8 @@ function json_test_read()
 	       "                              false,            \n" \
 	       "                              null    ],        \n" \
 	       "                \"number\": 42,                 \n" \
+	       "                \"eobj\":   [ ],                \n" \
+	       "                \"earr\":   { },                \n" \
 	       "                \"obj\":    { \"A\": \"a!\",    \n" \
 	       "                              \"B\": \"b!\",    \n" \
 	       "                              \"C\": \"c!\" },  \n" \
