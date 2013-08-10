@@ -43,7 +43,7 @@ function sp_reset(type)
 	# Per game
 	if (type >= 2) {
 		sp_channel  = ""    #     channel to play in
-		sp_state    = "new" #     {new,join,bid,play}
+		sp_state    = "new" #     {new,join,bid,pass,play}
 		sp_owner    = ""    #     Who started the game
 		sp_playto   = 0     #     Score the game will go to
 		sp_dealer   =-1     #     Who is dealing this round
@@ -451,7 +451,7 @@ sp_state == "play" &&
 }
 
 !sp_valid &&
-(sp_state "bid" || sp_state == "play") &&
+(sp_state == "bid" || sp_state == "play") &&
 /^\.(bid|play)\>/ {
 	if (sp_from in sp_players)
 		say(".slap " FROM ", it is not your turn.")
