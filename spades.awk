@@ -693,7 +693,7 @@ sp_state == "play" &&
 	}
 }
 
-/^\.((new|end|load)game|join|look|bid|play)/ {
+/^\.((new|end|load)game|join|look|bid|pass|play)/ {
 	sp_save("var/sp_cur.json");
 }
 
