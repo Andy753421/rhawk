@@ -716,18 +716,3 @@ sp_state == "play" &&
 /^\.((new|end|load)game|join|look|bid|pass|play)/ {
 	sp_save("var/sp_cur.json");
 }
-
-# Standin
-#/^\.playfor [^ ]*$/ {
-#}
-#
-#/^\.standin [^ ]*$/ {
-#	if (p in sp_players) {
-#	}
-#	for (p in sp_standin) {
-#		if ($2 in sp_standin) 
-#		say(here " is already playing for " sp_standin[p]);
-#	}
-#	sp_standin[away] = here
-#}
-#
