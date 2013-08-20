@@ -372,18 +372,38 @@ AUTH == OWNER &&
 # Help
 /^\.help [Ss]pades$/ {
 	say("Spades -- play a game of spades")
-	say("Examples:")
+	say(".help game -- setup and administer the game")
+	say(".help play -- commands for playing spades")
+	say(".help auth -- control player authorization")
+	next
+}
+
+/^\.help game$/ {
 	say(".newgame [score] -- start a game to <score> points, default 500")
 	say(".endgame -- abort the current game")
 	say(".savegame -- save the current game to disk")
 	say(".loadgame -- load the previously saved game")
+	next
+}
+
+/^\.help play$/ {
 	say(".join -- join the current game")
 	say(".look -- look at your cards")
-	say(".bid n -- bid for <n> tricks")
+	say(".bid [n] -- bid for <n> tricks")
+	say(".pass [card] -- pass a card to your partner")
 	say(".play [card] -- play a card")
-	say(".score -- check the score")
-	say(".tricks -- check how many trick have been taken")
+	say(".turn -- check whose turn it is")
 	say(".bids -- check what everyone bid")
+	say(".tricks -- check how many trick have been taken")
+	say(".score -- check the score")
+	next
+}
+
+/^\.help auth$/ {
+	say(".auth [who] -- display authentication info for a user")
+	say(".allow [who] -- allow another person to play on your behalf")
+	say(".deny [who] -- prevent a previously allowed user from playing")
+	say(".show -- display which users can play for which players")
 	next
 }
 
