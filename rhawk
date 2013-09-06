@@ -202,6 +202,16 @@ TO == NICK && /^\.?fortune/     {
 	next
 }
 
+/\<[Bb][Oo][Ff][Hh]\>/ {
+	_cmd = "fortune bofh-excuses"
+	_cmd | getline _fortune
+	_cmd | getline _fortune
+	_cmd | getline _fortune
+	close(_cmd)
+	say(_fortune)
+	next
+}
+
 # Morse code
 BEGIN {
 	morse["/"      ] = " "
