@@ -230,20 +230,18 @@ function sp_bags(i,	bags)
 	return bags
 }
 
+function sp_bid(who)
+{
+	return sp_nil[who] == 0 ? sp_bids[who] :
+	       sp_nil[who] == 1 ? "nil"        :
+	       sp_nil[who] == 2 ? "blind"      : "n/a"
+}
+
 function sp_bidders(	i, turn, bid, bids)
 {
-	for (i = 0; i < 4; i++) {
-		turn = (sp_dealer + i) % 4
-		if (sp_bids[turn] && !sp_nil[turn])
-			bid  = sp_order[turn] ":" sp_bids[turn]
-		else if (sp_nil[turn] == 1)
-			bid  = sp_order[turn] ":" "nil"
-		else if (sp_nil[turn] == 2)
-			bid  = sp_order[turn] ":" "blind"
-		else
-			continue
-		bids = bids " " bid
-	}
+	for (i = 0; i < 4; i++)
+		if (bid = sp_bid((sp_dealer + i) % 4))
+			bids = bids " " bid
 	gsub(/^ +| +$/, "", bids)
 	return bids
 }
@@ -673,19 +671,19 @@ sp_state == "play" &&
 }
 
 /^\.bids$/ && sp_state ~ "(pass|play)" {
-	say(sp_order[0] " bid " sp_bids[0] ", " \
-	    sp_order[2] " bid " sp_bids[2] ", " \
+	say(sp_order[0] " bid " sp_bid(0) ", " \
+	    sp_order[2] " bid " sp_bid(2) ", " \
 	    "total: " sp_bids[0] + sp_bids[2])
-	say(sp_order[1] " bid " sp_bids[1] ", " \
-	    sp_order[3] " bid " sp_bids[3] ", " \
+	say(sp_order[1] " bid " sp_bid(1) ", " \
+	    sp_order[3] " bid " sp_bid(3) ", " \
 	    "total: " sp_bids[1] + sp_bids[3])
 }
 
 /^\.tricks$/ && sp_state == "play" {
-	say(sp_order[0] " took " int(sp_tricks[0]) "/" int(sp_bids[0]) ", " \
-	    sp_order[2] " took " int(sp_tricks[2]) "/" int(sp_bids[2]))
-	say(sp_order[1] " took " int(sp_tricks[1]) "/" int(sp_bids[1]) ", " \
-	    sp_order[3] " took " int(sp_tricks[3]) "/" int(sp_bids[3]))
+	say(sp_order[0] " took " int(sp_tricks[0]) "/" sp_bid(0) ", " \
+	    sp_order[2] " took " int(sp_tricks[2]) "/" sp_bid(2))
+	say(sp_order[1] " took " int(sp_tricks[1]) "/" sp_bid(1) ", " \
+	    sp_order[3] " took " int(sp_tricks[3]) "/" sp_bid(3))
 }
 
 (TO == NICK || DST == sp_channel) &&
