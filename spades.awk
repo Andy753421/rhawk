@@ -239,9 +239,11 @@ function sp_bid(who)
 
 function sp_bidders(	i, turn, bid, bids)
 {
-	for (i = 0; i < 4; i++)
-		if (bid = sp_bid((sp_dealer + i) % 4))
-			bids = bids " " bid
+	for (i = 0; i < 4; i++) {
+		turn = (sp_dealer + i) % 4
+		if (bid = sp_bid(turn))
+			bids = bids " " sp_order[turn] ":" bid
+	}
 	gsub(/^ +| +$/, "", bids)
 	return bids
 }
