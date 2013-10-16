@@ -9,7 +9,7 @@
 BEGIN {
 	json_load("var/login.json",     login);
 	json_load("var/nounicode.json", nounicode);
-	json_load("var/nocolor.json",   nocolors);
+	json_load("var/nocolor.json",   nocolor);
 
 	OWNER = login["owner"];
 
