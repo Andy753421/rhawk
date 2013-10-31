@@ -161,6 +161,15 @@ function sp_next(who, prev)
 	return prev
 }
 
+function sp_shuf(i, mixed)
+{
+	asorti(sp_players, mixed, "sp_usort")
+	for (i in mixed) {
+		sp_order[i-1] = mixed[i]
+		sp_players[mixed[i]] = i-1
+	}
+}
+
 function sp_deal(	shuf)
 {
 	say("/me deals the cards")
@@ -470,8 +479,10 @@ sp_state == "play" &&
 		sp_order[i] = FROM
 		say(FROM " joins the game!")
 	}
-	if (sp_state == "join" && sp_turn == 0)
+	if (sp_state == "join" && sp_turn == 0) {
+		sp_shuf()
 		sp_deal()
+	}
 }
 
 /^\.allow \S+$/ {

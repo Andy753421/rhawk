@@ -42,12 +42,18 @@
 #          |          |      |- Is not playing for
 #          |          |      |- Can no longer play
 #          |          |      |- Is not playing for
-auth/auth: .        . .      .     . .  .     -As
-nope:      .        . Yauth  Nauth . .  .      .
-a/aa:      n        . Ya     Na    d b1 Yauth +As
-b/bb:      Ynewgame j Ynope  Nnope d b1 .      Ah
-c/cc:      Nnewgame j Yauth  Nauth d b1 .      Ad
-d/dd:      .        j Yauth  Nauth d b1 .      Ac
+#auth/auth: .        . .      .     . .  .     -As
+#nope:      .        . Yauth  Nauth . .  .      .
+#a/aa:      n        . Ya     Na    d b1 Yauth +As
+#b/bb:      Ynewgame j Ynope  Nnope d b1 .      Ah
+#c/cc:      Nnewgame j Yauth  Nauth d b1 .      Ad
+#d/dd:      .        j Yauth  Nauth d b1 .      Ac
+
+# Test sorting
+a: n j s
+b: . j .
+c: . j .
+d: . j .
 
 # Test scoring
 #x: s s s s s s s  s  s  s  s  s
