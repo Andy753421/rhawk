@@ -667,6 +667,7 @@ sp_state == "play" &&
 	}
 }
 
+/^\.bids/ && sp_state == "bid" ||
 /^\.turn/ && sp_state ~ "(bid|pass|play)" {
 	_bids = sp_bidders()
 	_pile = sp_pretty(sp_piles, FROM)
