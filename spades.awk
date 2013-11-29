@@ -437,6 +437,11 @@ sp_state == "play" &&
 
 
 # Setup
+match($0, /^\.newgame ?([0-9]+) *- *([0-9]+)$/, _arr) {
+	if (_arr[2] > _arr[1])
+		$0 = $1 " " int(rand() * (_arr[2]-_arr[1])+_arr[1])
+}
+
 /^\.newgame ?([0-9]+)?$/ {
 	if (sp_state != "new") {
 		reply("There is already a game in progress.")
