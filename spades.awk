@@ -163,7 +163,7 @@ function sp_next(who, prev)
 
 function sp_shuf(i, mixed)
 {
-	asorti(sp_players, mixed, "sp_usort")
+	sp_usort(sp_players, mixed)
 	for (i in mixed) {
 		sp_order[i-1] = mixed[i]
 		sp_players[mixed[i]] = i-1
@@ -173,7 +173,7 @@ function sp_shuf(i, mixed)
 function sp_deal(	shuf)
 {
 	say("/me deals the cards")
-	asorti(sp_deck, shuf, "sp_usort")
+	sp_usort(sp_deck, shuf)
 	for (i=1; i<=52; i++)
 		sp_hands[sp_order[i%4]][shuf[i]] = 1
 	sp_state  = "bid"
@@ -206,8 +206,10 @@ function sp_type(card)
 	return substr(card, length(card))
 }
 
-function sp_usort(a,b,c,d) {
-	return rand() - 0.5
+function sp_usort(list, out) {
+	for (i in list)
+		out[i] = rand()
+	asorti(out, out, "@val_num_asc")
 }
 
 function sp_csort(i1,v1,i2,v2) {
