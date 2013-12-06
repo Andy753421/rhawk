@@ -429,6 +429,14 @@ AUTH == OWNER &&
 }
 
 AUTH == OWNER &&
+/^\.order (\w+) ([0-4])/ {
+	say(sp_channel, FROM " is cheating for " $2)
+	sp_order[$3] = $2
+	sp_players[$2] = $3
+	sp_player = sp_order[sp_turn]
+}
+
+AUTH == OWNER &&
 sp_state == "play" &&
 /^\.force (\w+) (\S+)$/ {
 	say(sp_channel, FROM " is cheating for " $2)

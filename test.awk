@@ -19,7 +19,7 @@ function debug(msg)
 	print msg > "/dev/stderr"
 }
 
-function command(who, cmd)
+function command(who, cmd, i)
 {
 	arg=cmd
 	gsub(/\<[nbpYNS]|[+-]/, "", arg)
@@ -30,6 +30,7 @@ function command(who, cmd)
 	else if (cmd ~ /^Y/)      say(who, ".allow " arg)
 	else if (cmd ~ /^N/)      say(who, ".deny " arg)
 	else if (cmd ~ /^S/)      say(who, ".show ")
+	else if (cmd ~ /^o/)      say("andy753421", ".order " who " " i)
 	else if (cmd ~ /^d/)      say("andy753421", ".deal " who " " hand[who])
 	else if (cmd ~ /^l/)      say(who, ".look")
 	else if (cmd ~ /^b/)      say(who, ".bid "  arg)
@@ -68,9 +69,10 @@ BEGIN {
 	who         = parts[1]
 	players[pi] = parts[1]
 	auths[pi]   = parts[2]
-	hand[who]    = $0
-	gsub(/^\w*(\/\w*)?|[nbpYN-]\w+|\<[nejadwlbsBtpdS]\>|[.+]/, "", hand[who])
-	gsub(/^ */, "", hand[who])
+	hand[who]   = $0
+	gsub(/^\w*(\/\w*)?|[nbpYN-]\w+|\<[nejadowlbsBtpdS]\>|[.+]/, "", hand[who])
+	gsub(/^ *| *$/, "", hand[who])
+	gsub(/  */, " ", hand[who])
 	print who ": " hand[who] > "/dev/stderr"
 	say(who, "unicode :(")
 	say(who, "colors :(")
@@ -82,6 +84,6 @@ BEGIN {
 			auth(auths[pi], players[pi])
 	for (ti=0; ti<nturns; ti++)
 		for (pi=0; pi<length(players); pi++)
-			command(players[pi], turns[pi][ti])
+			command(players[pi], turns[pi][ti], pi)
 	reset()
 }
