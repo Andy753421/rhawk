@@ -547,8 +547,11 @@ match($0, /^\.newgame ?([0-9]+) *- *([0-9]+)$/, _arr) {
 
 sp_state ~ "(bid|pass|play)" &&
 /^\.show/ {
+	delete _lines
 	for (_i in sp_share)
-		say(_i " can play for " sp_share[_i]);
+		_lines[sp_share[_i]] = _lines[sp_share[_i]] " " _i
+	for (_i in _lines)
+		say(_i " allowed:" _lines[_i])
 }
 
 !sp_valid &&
