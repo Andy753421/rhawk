@@ -72,20 +72,20 @@
 #d: . j o d . b7 +Ac pAc -Ah Kc Qc Jc 10c 9c 8c 7c 6c 5c 4c 3c 2c . .
 
 # Nil/blind (passing modified)
-a: n j o d . b0 +As pAs  Ad
-b: . j o d l b1 +Ah pAh -Ac
-c: . j o d l b7 +Ad pAd  As
-d: . j o d l b7 +Ac pAc -Ah
+#a: n j o d . b0 +As pAs  Ad
+#b: . j o d l b1 +Ah pAh -Ac
+#c: . j o d l b7 +Ad pAd  As
+#d: . j o d l b7 +Ac pAc -Ah
 
 #a: n j o d l b0 +As pAs  Ad
 #b: . j o d l b0 +Ah pAh -Ac
 #c: . j o d l b7 +Ad pAd  As
 #d: . j o d l b7 +Ac pAc -Ah
 
-#a: n j o d l b0  .  .    As
-#b: . j o d l b1 +Ah pAh -Ac
-#c: . j o d l b7  .  .    Ad
-#d: . j o d l b7 +Ac pAc -Ah
+a: n j o d l b0  .  .    As
+b: . j o d l b1 +Ah pAh -Ac
+c: . j o d l b7  .  .    Ad
+d: . j o d l b7 +Ac pAc -Ah
 
 # Test full game
 #a: n j o d l b1  -Ah As Ks Qs Js 10s 9s 8s 7s 6s 5s 4s 3s 2s t

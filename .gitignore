@@ -2,4 +2,5 @@
 *.swp
 *.so
 *.o
+spades.txt
 config.h

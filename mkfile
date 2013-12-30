@@ -5,7 +5,7 @@ test:Q:
 	rm -f var/sp_cur.json
 	#awk -f rhawk < testirc.txt
 	#awk -f rhawk < testirc.txt
-	awk -f test.awk test.txt \
+	awk -f test.awk spades.txt \
 	| awk '-vDEBUG=1' -frhawk 2>&1 1>/dev/null \
 	| grep -v '^  > \(USER\|NICK\|CAP\|JOIN\|TOPIC\|WHO\)' \
 	| grep -v '^  . .*\(ACCOUNT\|IDENTIFY\|unicode\|colors\)' \
