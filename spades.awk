@@ -248,6 +248,12 @@ function sp_bid(who)
 	       sp_nil[who] == 2 ? "blind"      : "n/a"
 }
 
+function sp_passer(who)
+{
+	return sp_nil[(who+0)%4] == 2 || sp_nil[(who+1)%4] != 0 ||
+	       sp_nil[(who+2)%4] == 2 || sp_nil[(who+3)%4] != 0
+}
+
 function sp_bidders(	i, turn, bid, bids)
 {
 	for (i = 0; i < 4; i++) {
@@ -587,8 +593,7 @@ sp_state == "bid" &&
 				say(p, "You have: " sp_hand(p, p))
 			sp_state = "play"
 			for (i=0; i<2; i++) {
-				if (sp_nil[(i+0)%4] == 2 || sp_nil[(i+2)%4] == 2 ||
-				    sp_nil[(i+1)%4] != 0 || sp_nil[(i+3)%4] != 0) {
+				if (sp_passer(i)) {
 					say(sp_team(i) ": select a card to pass " \
 					    "(/msg " NICK " .pass <card>)")
 					sp_state = "pass"
@@ -609,7 +614,7 @@ sp_state == "pass" &&
 	if (!(sp_from in sp_players)) {
 		say(".slap " FROM ", you are not playing.")
 	}
-	else if (sp_nil[_team] == 1 && sp_nil[_team+2] == 1) {
+	else if (!sp_passer(_team)) {
 		reply("Your team did not go blind")
 	}
 	else if (sp_pass[sp_players[sp_from]]) {
@@ -627,8 +632,8 @@ sp_state == "pass" &&
 	}
 
 	# check for end of passing
-	if (((sp_nil[0] == 1 && sp_nil[2] == 1) || (sp_pass[0] && sp_pass[2])) &&
-	    ((sp_nil[1] == 1 && sp_nil[3] == 1) || (sp_pass[1] && sp_pass[3]))) {
+	if ((!sp_passer(0) || (sp_pass[0] && sp_pass[2])) &&
+	    (!sp_passer(1) || (sp_pass[1] && sp_pass[3]))) {
 		for (i in sp_pass) {
 			_partner = (i+2)%4
 			_card    = sp_pass[i]
@@ -699,7 +704,7 @@ sp_state == "play" &&
 	if (sp_state == "play" && _pile)
 		say("It is " sp_player "'s turn! (" _pile ")")
 	for (_i=0; sp_state == "pass" && _i<4; _i++)
-		if ((sp_nil[_i%2+0]!=1 || sp_nil[_i%2+2]!=1) && !sp_pass[_i])
+		if (sp_passer(_i) && !sp_pass[_i])
 			say("Waiting for " sp_order[_i] " to pass a card!")
 }
 
