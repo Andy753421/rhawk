@@ -33,6 +33,7 @@ function sp_reset(type)
 	if (type >= 1) {
 		sp_state    = "bid" #     {new,join,bid,pass,play}
 		sp_broken   = 0     #     Whether spades are broken
+		delete sp_hands     # [p] Each players cards
 		delete sp_looked    # [i] Whether a player has looked a their cards
 		delete sp_bids      # [i] Each players bid
 		delete sp_nil       # [i] Nil multiplier 0=regular, 1=nil, 2=blind
@@ -50,7 +51,6 @@ function sp_reset(type)
 		sp_turn     = 0     #     Index of who's turn it is
 		sp_player   = ""    #     Who's turn it is
 		sp_limit    = 10    #     Bag out limit / nil bonus
-		delete sp_hands     # [p] Each players cards
 		delete sp_players   # [p] Player names players["name"] -> i
 		delete sp_auths     # [c] Player auth names auths["auth"] -> "name"
 		delete sp_share     # [c] Player teammates share["friend"] -> "name"
