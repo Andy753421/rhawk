@@ -61,9 +61,11 @@ function sp_reset(type)
 
 function sp_acopy(dst, src,	key)
 {
-	if (isarray(src))
+	if (isarray(src)) {
+		delete(dst)
 		for (key in src)
 			json_copy(dst, key, src[key])
+	}
 }
 
 function sp_save(file,	game)
