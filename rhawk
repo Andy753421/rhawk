@@ -400,6 +400,7 @@ FROM == "rhnoise" && load_mod {
 # Decrementer
 BEGIN {
 	user_scores[0] = 1;
+	delete user_scores
 }
 
 /^\.(scores|scoreboard)$/ {
