@@ -318,6 +318,11 @@ TO == NICK && DST ~ /^#/ {
 	#say("Hello, " FROM)
 }
 
+/^\.nestroyeti/ {
+	say(sprintf("Temperature: %4.1f F Humidity: %2d%%",
+		rand()*20+65, rand()*20+40))
+}
+
 #DST != "#sfvlug" &&
 !(FROM in bots) &&
 CMD == "PRIVMSG" &&
