@@ -298,6 +298,12 @@ function sp_score(	bids, times, tricks)
 		sp_scores[i%2] += sp_limit * 10 * sp_nil[i] * \
 			(sp_tricks[i] == 0 ? 1 : -1)
 	}
+	if (sp_scores[0] > sp_scores[1])
+		say(sp_team(0) " lead " sp_scores[0] " to " sp_scores[1])
+	else if (sp_scores[1] > sp_scores[0])
+		say(sp_team(1) " lead " sp_scores[1] " to " sp_scores[0])
+	else
+		say("tied at " sp_scores[0])
 }
 
 function sp_play(card,	winner, pi)
