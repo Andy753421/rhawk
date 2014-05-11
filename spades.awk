@@ -701,16 +701,23 @@ sp_state == "play" &&
 
 /^\.bids/ && sp_state == "bid" ||
 /^\.turn/ && sp_state ~ "(bid|pass|play)" {
-	_bids = sp_bidders()
-	_pile = sp_pretty(sp_piles, FROM)
+	_bids  = sp_bidders()
+	_pile  = sp_pretty(sp_piles, FROM)
+	_extra = ""
+
+	for (_i in sp_share)
+		if (/!/ && sp_share[_i] == sp_player)
+			_extra = _extra " " _i "!"
+
 	if (sp_state == "bid" && !_bids)
-		say("It is " sp_player "'s bid!")
+		say("It is " sp_player "'s bid!" _extra)
 	if (sp_state == "bid" && _bids)
-		say("It is " sp_player "'s bid! (" _bids ")")
+		say("It is " sp_player "'s bid!" _extra " (" _bids ")")
 	if (sp_state == "play" && !_pile)
-		say("It is " sp_player "'s turn!")
+		say("It is " sp_player "'s turn!" _extra)
 	if (sp_state == "play" && _pile)
-		say("It is " sp_player "'s turn! (" _pile ")")
+		say("It is " sp_player "'s turn!" _extra " (" _pile ")")
+
 	for (_i=0; sp_state == "pass" && _i<4; _i++)
 		if (sp_passer(_i) && !sp_pass[_i])
 			say("Waiting for " sp_order[_i] " to pass a card!")
