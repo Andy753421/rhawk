@@ -197,14 +197,19 @@ function geoip(ip,  dat, cmd, line, parts) {
 
 	if (split(line, parts, /[:,] /) >= 9)
 		return parts[8] ","  parts[9] " -- " \
-		       parts[6] ", " parts[4] ", " parts[3] " -- " ip
+		       parts[6] ", " parts[4] ", " parts[3]
 	else
-		return "not found -- " ip
+		return "not found"
 }
 
 /^\.geoip (([0-9a-zA-Z_.-]+) *)*$/ {
-	for (_i=2; _i<=NF; _i++)
-		say(geoip($_i))
+	for (_i=2; _i<=NF; _i++) {
+		if ($_i in USERS)
+			say(geoip(USERS[$_i]["host"]) " -- " \
+			    $_i " -> " USERS[$_i]["host"])
+		else
+			say(geoip($_i) " -- " $_i)
+	}
 }
 
 # Fortune
