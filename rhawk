@@ -187,6 +187,26 @@ BEGIN {
 		say("no auth info for " _who)
 }
 
+# GeoIP Lookup
+function geoip(ip,  dat, cmd, line, parts) {
+	dat = "/usr/share/GeoIP/GeoIPCity.dat"
+
+	cmd = "geoiplookup -f " dat " " ip
+	cmd | getline line
+	close(cmd)
+
+	if (split(line, parts, /[:,] /) >= 9)
+		return parts[8] ","  parts[9] " -- " \
+		       parts[6] ", " parts[4] ", " parts[3] " -- " ip
+	else
+		return "not found -- " ip
+}
+
+/^\.geoip (([0-9a-zA-Z_.-]+) *)*$/ {
+	for (_i=2; _i<=NF; _i++)
+		say(geoip($_i))
+}
+
 # Fortune
 TO == NICK && /^/               { extra = ""   }
 TO == NICK && /^\.?fortune.*-o/ { extra = "-o" }
