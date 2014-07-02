@@ -461,12 +461,12 @@ sp_state == "play" &&
 
 
 # Setup
-match($0, /^\.newgame ?([0-9]+) *- *([0-9]+)$/, _arr) {
+match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 	if (_arr[2] > _arr[1])
 		$0 = $1 " " int(rand() * (_arr[2]-_arr[1])+_arr[1])
 }
 
-/^\.newgame ?([0-9]+)?$/ {
+/^\.newgame ?([1-9][0-9]*)?$/ {
 	if (sp_state != "new") {
 		reply("There is already a game in progress.")
 	} else {
@@ -579,7 +579,7 @@ sp_state ~ "(bid|pass|play)" &&
 
 sp_valid &&
 sp_state == "bid" &&
-/^\.bid [0-9]+$/ {
+/^\.bid [1-9][0-9]*$/ {
 	if ($2 < 0 || $2 > 13) {
 		say("You can only bid from 0 to 13")
 	} else {
