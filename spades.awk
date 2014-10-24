@@ -579,7 +579,7 @@ sp_state ~ "(bid|pass|play)" &&
 
 sp_valid &&
 sp_state == "bid" &&
-/^\.bid [1-9][0-9]*$/ {
+/^\.bid (0|[1-9][0-9]*)$/ {
 	if ($2 < 0 || $2 > 13) {
 		say("You can only bid from 0 to 13")
 	} else {
