@@ -595,7 +595,7 @@ sp_state == "bid" &&
 			sp_nil[i] = 0
 		}
 		if (sp_turn != sp_dealer) {
-			say("Bidding goes to " sp_player "!")
+			say("Bidding goes to " sp_player "! (" sp_bidders() ")")
 		} else {
 			for (p in sp_players)
 				say(p, "You have: " sp_hand(p, p))
