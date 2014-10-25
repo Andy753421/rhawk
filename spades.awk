@@ -760,8 +760,8 @@ sp_state == "play" &&
 
 	if (/!!/ && (sp_state == "bid" || sp_state == "play")) {
 		if (sp_player in sp_notify) {
-			if (!_bids) _bids = "none"
-			if (!_pile) _pile = "none"
+			_bids = _bids ? _bids    : "none"
+			_pile = _pile ? sp_piles : "none"
 			mail_send(sp_notify[sp_player],     \
 				"It is your " sp_state "!", \
 				"Bids so far:  " _bids "\n" \
