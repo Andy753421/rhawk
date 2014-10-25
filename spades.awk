@@ -760,11 +760,12 @@ sp_state == "play" &&
 
 	if (/!!/ && (sp_state == "bid" || sp_state == "play")) {
 		if (sp_player in sp_notify) {
-			mail_send(sp_notify[sp_player],                         \
-				(sp_state == "bid"  ? "It is your bid!"  : "")  \
-				(sp_state == "play" ? "It is your turn!" : ""), \
-				(sp_state == "bid"  ? "Bids: " _bids     : "")  \
-				(sp_state == "play" ? "Pile: " _pile     : ""))
+			if (!_bids) _bids = "none"
+			if (!_pile) _pile = "none"
+			mail_send(sp_notify[sp_player],     \
+				"It is your " sp_state "!", \
+				"Bids so far:  " _bids "\n" \
+				"Cards played: " _pile)
 			say("Notified " sp_player " at " sp_notify[sp_player])
 		} else {
 			say("No email address for " sp_player)
