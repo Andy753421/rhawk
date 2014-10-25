@@ -3,7 +3,7 @@
 @include "irc.awk"
 @include "json.awk"
 @include "spades.awk"
-#@include "email.awk"
+@include "email.awk"
 
 # Initialization
 BEGIN {

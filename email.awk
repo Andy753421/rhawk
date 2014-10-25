@@ -1,10 +1,6 @@
 @include "json.awk"
 
 # Save email addresses
-END {
-	json_save("var/mail.json", mail_enable)
-}
-
 BEGIN {
 	json_load("var/mail.json", mail_enable)
 	for (_user in mail_enable)
@@ -23,7 +19,7 @@ BEGIN {
 	mail_before = 5*60 # someone mentions their name and does not reply within
 	mail_after  = 5*60 # mail_after seconds, email them hist seconds of the backlog
 
-	mail_from   = NICK "<andy753421@gmail.com>"
+	mail_from   = NICK "<" NICK "@pileus.org>"
 	mail_err    = "If you received this message in error,\n" \
 	              "someone in #rhnoise is being a jerk"
 }
@@ -80,46 +76,70 @@ function mail_run(  user, chan, ready, time)
 	}
 }
 
+function mail_save(file)
+{
+	json_save(file, mail_enable)
+}
+
+# Help
+/^\.help$/ {
+	say(".help mail -- manage email subscriptions")
+}
+
+/^\.help e?mail$/ {
+	say("Mail -- email users when they are mentioned")
+	say(".subscribe [addr] -- set your mailing address to [addr]")
+	say(".unsubscribe [addr] -- remove your subscription")
+	say(".addresses -- show your subscription address")
+	next
+}
+
+# Commands
 AUTH == OWNER &&
 TO == NICK &&
-/^e?mail .* .*/ {
+/^subscribe .* .*/ {
 	reply("notifying " $2 " for " $3)
 	mail_enable[$3] = $2
+	mail_save("var/mail.json")
 }
 
 TO == NICK &&
-/^e?mail  *[^ ]*$/ {
+/^subscribe  *[^ ]*$/ {
 	_user = FROM
 	_addr = $2
 	gsub(/[^a-zA-Z0-9_+@.-]/, "", _user)
 	gsub(/[^a-zA-Z0-9_+@.-]/, "", _addr)
 	reply("notifying " _addr " for " _user)
 	mail_enable[_user] = _addr
+	mail_save("var/mail.json")
 }
 
 AUTH == OWNER &&
 TO == NICK &&
-/^stfu .*/ {
+/^unsubscribe .*/ {
 	reply("well fine then")
 	delete mail_enable[$2]
 	delete mail_ready[$2]
 	delete mail_seen[$2]
+	mail_save("var/mail.json")
 }
 
 TO == NICK &&
-/^stfu$/ {
+/^unsubscribe$/ {
 	reply("well fine then")
 	delete mail_enable[FROM]
 	delete mail_ready[FROM]
 	delete mail_seen[FROM]
+	mail_save("var/mail.json")
 }
 
 TO == NICK &&
-/^who/ {
+/^addresses/ {
 	for (_user in mail_enable)
 		reply("\"" _user "\" <" mail_enable[_user] ">")
 }
 
+# Message logging and monitoring
 DST ~ /^#.*/ {
 	for (_user in mail_enable) {
 		_idle = systime() - mail_seen[_user]
