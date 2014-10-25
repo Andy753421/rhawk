@@ -182,7 +182,7 @@ function sp_deal(	shuf)
 	sp_dealer = (sp_dealer+1)%4
 	sp_turn   =  sp_dealer
 	sp_player =  sp_order[sp_turn]
-	say(sp_player ": bidding starts with you!")
+	say(sp_player ": you bid first!")
 }
 
 function sp_hand(to, who,	sort, str)
@@ -581,7 +581,7 @@ sp_valid &&
 sp_state == "bid" &&
 /^\.bid (0|[1-9][0-9]*)$/ {
 	if ($2 < 0 || $2 > 13) {
-		say("You can only bid from 0 to 13")
+		reply("You can only bid from 0 to 13")
 	} else {
 		i = sp_next()
 		sp_bids[i] = $2
@@ -595,7 +595,7 @@ sp_state == "bid" &&
 			sp_nil[i] = 0
 		}
 		if (sp_turn != sp_dealer) {
-			say(sp_player ": bidding goes to you! (" sp_bidders() ")")
+			say(sp_player ": it is your bid! (" sp_bidders() ")")
 		} else {
 			for (p in sp_players)
 				say(p, "You have: " sp_hand(p, p))
@@ -608,7 +608,7 @@ sp_state == "bid" &&
 				}
 			}
 			if (sp_state == "play")
-				say(sp_player ": play starts with you!")
+				say(sp_player ": you have the opening lead!")
 		}
 	}
 }
@@ -648,7 +648,8 @@ sp_state == "pass" &&
 			delete sp_hands[sp_order[i]][_card]
 			sp_hands[sp_order[_partner]][_card] = 1
 		}
-		say(sp_channel, sp_player ": cards have been passed, play starts with you!")
+		say(sp_channel, "Cards have been passed!")
+		say(sp_channel, sp_player ": you have the opening lead!")
 		for (p in sp_players)
 			say(p, "You have: " sp_hand(p, p))
 		sp_state = "play"
