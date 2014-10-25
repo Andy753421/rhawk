@@ -160,13 +160,15 @@ function uptime(time,  fmt) {
 		time / (1       ) % 60)
 }
 BEGIN {
-	up_version = head("git describe --always --dirty")
+	up_version = head("git describe --always")
+	up_dirty   = head("git describe --always --dirty")
 	up_author  = head("git log -n1 --format=format:%an")
 	up_message = head("git log -n1 --format=format:%s")
 	up_reload  = systime();
 }
 /^\.(version|rev)/ {
-	say("version: " up_version " - " up_author " - " up_message)
+	say("version: " up_dirty " - " up_author " - " up_message)
+	say("http://pileus.org/git/?p=~andy/rhawk;h=" up_version)
 }
 /^\.uptime/ {
 	_now = systime();
