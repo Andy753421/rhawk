@@ -18,23 +18,24 @@ BEGIN {
 	mail_hist   = 5*60 # If the users has not spoken withn mail_before before
 	mail_before = 5*60 # someone mentions their name and does not reply within
 	mail_after  = 5*60 # mail_after seconds, email them hist seconds of the backlog
-
-	mail_from   = NICK "<" NICK "@pileus.org>"
-	mail_err    = "If you received this message in error,\n" \
-	              "someone in #rhnoise is being a jerk"
 }
 
 function mail_send(addr, subj, body,
-		   sendmail, errmsg)
+		   from, error, sendmail, errmsg)
 {
+	from  = NICK "<" NICK "@pileus.org>"
+	error = "If you received this message in error,\n" \
+	        "someone in #rhnoise is being a jerk"
+
 	gsub(/[^a-zA-Z0-9_+@.-]/, "", addr)
 	sendmail = "/usr/sbin/sendmail " addr
-	print "To: " addr        | sendmail
-	print "From: " mail_from | sendmail
-	print "Subject: " subj   | sendmail
-	print ""                 | sendmail
-	print body               | sendmail
-	print mail_err           | sendmail
+	print "To: " addr      | sendmail
+	print "From: " from    | sendmail
+	print "Subject: " subj | sendmail
+	print ""               | sendmail
+	print body             | sendmail
+	print ""               | sendmail
+	print error            | sendmail
 	close(sendmail)
 }
 
