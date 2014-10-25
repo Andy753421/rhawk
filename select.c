@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include "awk.h"
+#include <awk.h>
 
 int plugin_is_GPL_compatible;
 
@@ -43,7 +43,7 @@ static NODE *do_select(int nargs)
 	if (!strcmp("any",   how->stptr)) read = write = except = 1;
 	if (!read && !write && !except) {
 		printf("select: invalid select type: %.*s\n",
-				how->stlen, how->stptr);
+				(int)how->stlen, how->stptr);
 		return make_number((AWKNUM) -EINVAL);
 	}
 
