@@ -57,6 +57,11 @@ function sp_reset(type)
 		delete sp_order     # [i] Player order order[i] -> "name"
 		delete sp_scores    # [i] Teams score
 	}
+
+	# Persistent
+	if (type >= 3) {
+		delete sp_notify    # [p] E-mail notification address
+	}
 }
 
 function sp_acopy(dst, src,	key)
@@ -98,6 +103,7 @@ function sp_save(file,	game)
 	json_copy(game, "share",   sp_share);
 	json_copy(game, "order",   sp_order);
 	json_copy(game, "scores",  sp_scores);
+	json_copy(game, "notify",  sp_notify);
 
 	# Save
 	json_save(file, game);
@@ -137,6 +143,7 @@ function sp_load(file,	game)
 	sp_acopy(sp_share,   game["share"]);
 	sp_acopy(sp_order,   game["order"]);
 	sp_acopy(sp_scores,  game["scores"]);
+	sp_acopy(sp_notify,  game["notify"]);
 }
 
 function sp_pretty(cards, who)
@@ -433,6 +440,7 @@ AUTH == OWNER &&
 	say(".allow [who] -- allow another person to play on your behalf")
 	say(".deny [who] -- prevent a previously allowed user from playing")
 	say(".show -- display which users can play for which players")
+	say(".notify [addr] -- email user when it is their turn")
 	next
 }
 
@@ -561,6 +569,29 @@ match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 		reply(_str " can no longer play for " sp_from)
 		delete sp_share[_who]
 	}
+}
+
+/^\.notify$/ {
+	if (sp_from in sp_notify)
+		reply("Your address is " sp_notify[sp_from])
+	else
+		reply("Your address is not set")
+}
+
+/^\.notify clear$/ {
+	if (sp_from in sp_notify) {
+		reply("Removing address " sp_notify[sp_from])
+		delete sp_notify[sp_from]
+	} else {
+		reply("Your address is not set")
+	}
+}
+
+/^\.notify \S+@\S+.\S+$/ {
+	_addr = $2
+	gsub(/[^a-zA-Z0-9_+@.-]/, "", _addr)
+	sp_notify[sp_from] = _addr
+	reply("Notifying you at " _addr)
 }
 
 sp_state ~ "(bid|pass|play)" &&
@@ -726,6 +757,19 @@ sp_state == "play" &&
 	for (_i=0; sp_state == "pass" && _i<4; _i++)
 		if (sp_passer(_i) && !sp_pass[_i])
 			say("Waiting for " sp_order[_i] " to pass a card!")
+
+	if (/!!/ && (sp_state == "bid" || sp_state == "play")) {
+		if (sp_player in sp_notify) {
+			mail_send(sp_notify[sp_player],                         \
+				(sp_state == "bid"  ? "It is your bid!"  : "")  \
+				(sp_state == "play" ? "It is your turn!" : ""), \
+				(sp_state == "bid"  ? "Bids: " _bids     : "")  \
+				(sp_state == "play" ? "Pile: " _pile     : ""))
+			say("Notified " sp_player " at " sp_notify[sp_player])
+		} else {
+			say("No email address for " sp_player)
+		}
+	}
 }
 
 /^\.bids$/ && sp_state ~ "(pass|play)" {
@@ -769,6 +813,6 @@ sp_state == "play" &&
 	}
 }
 
-/^\.((new|end|load)game|join|look|bid|pass|play)/ {
+/^\.((new|end|load)game|join|look|bid|pass|play|notify)/ {
 	sp_save("var/sp_cur.json");
 }
