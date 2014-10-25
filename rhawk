@@ -356,12 +356,6 @@ MSG !~ /^\./ &&
 	say("Awk, awk, awk! I'm a bird!")
 }
 
-!(FROM in bots) &&
-((TO == NICK && /(help|halp)/) ||
- /^[^.](help|halp)/) {
-	reply("Nothing can help you now..")
-}
-
 /(\<[Hh][Oo]\>.*){3}/ {
 	say("\00309Merry \00304Christmas!")
 }

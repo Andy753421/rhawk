@@ -395,6 +395,10 @@ AUTH == OWNER &&
 }
 
 # Help
+/^\.help$/ {
+	say(".help spades -- play a game of spades")
+}
+
 /^\.help [Ss]pades$/ {
 	say("Spades -- play a game of spades")
 	say(".help game -- setup and administer the game")
