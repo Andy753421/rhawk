@@ -117,7 +117,14 @@ function json_write_number(number)
 
 function json_write_string(string)
 {
-	# todo: special characters
+	gsub(/\\/, "\\\\", string)
+	gsub(/"/,  "\\\"", string)
+	gsub(/\b/, "\\b",  string)
+	gsub(/\f/, "\\f",  string)
+	gsub(/\n/, "\\n",  string)
+	gsub(/\r/, "\\r",  string)
+	gsub(/\t/, "\\t",  string)
+
 	return "\"" string "\""
 }
 
@@ -126,7 +133,7 @@ function json_write_string(string)
 function json_tokenize(str, tokens,   i, line, items, table, type, found)
 {
 	table["term"]  = "^[\\[\\]{}:,]"
-	table["str"]   = "^\"[^\"]*\""
+	table["str"]   = "^\"([^\\\\\"]|\\\\.)*\""
 	table["num"]   = "^[+-]?[0-9]+(.[0-9]+)?"
 	table["var"]   = "^(true|false|null)"
 	table["space"] = "^[ \\t]+"
@@ -159,11 +166,12 @@ function json_tokenize(str, tokens,   i, line, items, table, type, found)
 			return 0
 		}
 	}
-	return i
 
 	#for (i = 0; i < length(tokens); i++)
 	#	printf "%-3s %-5s [%s]\n", i":",
 	#		tokens[i]["type"], tokens[i]["text"]
+
+	return i
 }
 
 function json_parse_value(tokens, i, value, key,   line, type, text)
@@ -249,6 +257,15 @@ function json_parse_string(tokens, i, value, key,   text)
 	text = tokens[i++]["text"]
 	len  = length(text);
 	text = len == 2 ? "" : substr(text, 2, len-2)
+
+	gsub(/\\\\/, "\\", text)
+	gsub(/\\"/,  "\"", text)
+	gsub(/\\b/,  "\b", text)
+	gsub(/\\f/,  "\f", text)
+	gsub(/\\n/,  "\n", text)
+	gsub(/\\r/,  "\r", text)
+	gsub(/\\t/,  "\t", text)
+
 	json_copy(value, key, text)
 	#print "parse_string: [" text "]"
 	return i
@@ -270,7 +287,7 @@ function json_parse_var(tokens, i, value, key,   text, null)
 function json_load(file, var,   line, text, tokens, data, key)
 {
 	while ((getline line < file) > 0)
-		text = text line
+		text = text line "\n"
 	close(file)
 	if (!json_tokenize(text, tokens))
 		return ""
@@ -344,7 +361,8 @@ function json_test_read()
 	       "                \"str\":    \"hello, world\" }, \n" \
 	       "  \"second\": { \"arr\":    [ \"zero\",         \n" \
 	       "                              \"one\",          \n" \
-	       "                              \"two\" ],        \n" \
+	       "                              \"two\",          \n" \
+	       "                              \"\\\"\t\r\b\" ], \n" \
 	       "                \"number\": 42,                 \n" \
 	       "                \"obj\":    { \"A\": \"a!\",    \n" \
 	       "                              \"B\": \"b!\",    \n" \
