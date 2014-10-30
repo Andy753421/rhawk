@@ -1,3 +1,12 @@
+# usage:
+# 	@include "json.awk"
+# 	BEGIN {
+# 		src["hello"] = "world"
+# 		json_save("test.json", src)
+# 		json_load("test.json", dst)
+# 		print dst["hello"]
+# 	}
+#
 # value:
 # 	object: { string : value, .. }
 # 	array:  [ value, .. ]
