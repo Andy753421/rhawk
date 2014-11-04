@@ -709,9 +709,6 @@ sp_state == "play" &&
 	if (!(_card in sp_deck)) {
 		reply("Invalid card")
 	}
-	else if (!(_card in sp_hands[sp_from])) {
-		reply("You do not have that card")
-	}
 	else if (sp_suit && _card !~ sp_suit && sp_hasa(sp_from, sp_suit)) {
 		reply("You must follow suit (" sp_suit ")")
 	}
@@ -720,6 +717,9 @@ sp_state == "play" &&
 	}
 	else if (_card ~ /s/ && length(sp_pile) == 0 && sp_hasa(sp_from, "[^s]$") && !sp_broken) {
 		reply("Spades have not been broken")
+	}
+	else if (!(_card in sp_hands[sp_from])) {
+		reply("You do not have that card")
 	}
 	else {
 		sp_play(_card)
