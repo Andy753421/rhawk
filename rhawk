@@ -394,6 +394,14 @@ FROM == "rhnoise" && $2 == "slaps" && $3 == NICK {
 	say("Springtime for Hitler and Germany!");
 }
 
+/^.drank mauchter/ {
+	if (!drank) {
+		system("sleep " 2)
+		say("\x02MD 20/20\x0f - \x02Morgen David\x0f - \x02Under an overpass\x0f - ***** (3 minutes ago)");
+	}
+	drank=1
+}
+
 # God damn commands
 FROM == "rhnoise" && load_mod {
 	say(".load " load_mod)
