@@ -129,3 +129,26 @@ BEGIN {
 	sfvlug_polled = systime()
 }
 
+/^.meeting/ {
+	if (!sfvlug_meetup()) {
+		say("Error looking up meeting")
+		next
+	}
+
+	_name  = sfvlug_event["name"]
+	_desc  = sfvlug_event["description"]
+	_where = sfvlug_event["venue"]["name"]  ", " \
+	         sfvlug_event["venue"]["city"]  ", " \
+	         sfvlug_event["venue"]["state"] ", " \
+	         sfvlug_event["venue"]["zip"]
+	_when  = sfvlug_event["time"] + \
+	         sfvlug_event["utc_offset"]
+	_when  = strftime("%a %B %d, %l:%M%P", _when/1000)
+	_desc = gensub(/<[^>]*>/, "",  "g", _desc);
+	_desc = gensub(/\\(.)/, "\\1", "g", _desc);
+
+	say("Next meeting: " _name)
+	say("Time: "         _when)
+	say("Location: "     _where)
+	say("Details: "      _desc)
+}
