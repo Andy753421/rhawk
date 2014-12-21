@@ -283,13 +283,10 @@ function json_parse_var(tokens, i, value, key,   text, null)
 }
 
 
-# Nice API?
-function json_load(file, var,   line, text, tokens, data, key)
+# String API
+function json_decode(string, var,   tokens, data, key)
 {
-	while ((getline line < file) > 0)
-		text = text line "\n"
-	close(file)
-	if (!json_tokenize(text, tokens))
+	if (!json_tokenize(string, tokens))
 		return ""
 	if (!json_parse_value(tokens, 0, data, 0))
 		return ""
@@ -300,12 +297,25 @@ function json_load(file, var,   line, text, tokens, data, key)
 	return 1
 }
 
+function json_encode(var, pad)
+{
+	return json_write_value(var, pad)
+}
+
+# File API
+function json_load(file, var,   line, string)
+{
+	while ((getline line < file) > 0)
+		string = string line "\n"
+	return json_decode(string, var)
+}
+
 function json_save(file, var,   cmd, tmp)
 {
 	cmd = "mktemp " file ".XXX"
 	cmd | getline tmp
 	close(cmd)
-	print json_write_value(var) > tmp
+	print json_encode(var) > tmp
 	close(tmp)
 	system("mv " tmp " " file)
 }
@@ -314,6 +324,7 @@ function json_save(file, var,   cmd, tmp)
 # Test functions
 function json_test_write()
 {
+	print "Testing JSON Write:"
 	num      = 42
 	str      = "hello, world"
 	arr[0]   = "zero"
@@ -328,23 +339,23 @@ function json_test_write()
 	json_copy(mix, "obj",    obj);
 	json_copy(dub, "first",  mix);
 	json_copy(dub, "second", mix);
-	print json_write_value(num)
-	print json_write_value(str)
-	print json_write_value(arr)
-	print json_write_value(obj)
-	print json_write_value(mix)
-	print json_write_value(dub)
+	print json_encode(num)
+	print json_encode(str)
+	print json_encode(arr)
+	print json_encode(obj)
+	print json_encode(mix)
+	print json_encode(dub)
 }
 
 function json_test_read()
 {
-	json_tokenize("[8, \"abc\", 9]", tokens)
-	json_parse_value(tokens, 0, array, 0)
-	print json_write_value(array[0])
+	print "Testing JSON Read:"
 
-	json_tokenize("{\"abc\": 1, \"def\": 2}", tokens)
-	json_parse_value(tokens, 0, array, 0)
-	print json_write_value(array[0])
+	json_decode("[8, \"abc\", 9]", array);
+	print json_encode(array)
+
+	json_decode("{\"abc\": 1, \"def\": 2}", array)
+	print json_encode(array)
 
 	json = "{ \"first\":  { \"arr\":    [ \"\",             \n" \
 	       "                              -1,               \n" \
@@ -369,19 +380,19 @@ function json_test_read()
 	       "                              \"C\": \"c!\" },  \n" \
 	       "                \"str\":    \"hello, world\" } }\n"
 
-	json_tokenize(json, tokens)
-	json_parse_value(tokens, 0, array, 0)
-	print json_write_value(array[0])
+	json_decode(json, array)
+	print json_encode(array)
 }
 
 function json_test_files()
 {
+	print "Testing JSON Files:"
 	print "load: [" json_load("email.txt", mail) "]"
-	print "mail: "  json_write_value(mail, "      ")
+	print "mail: "  json_encode(mail, "      ")
 	mail["andy753421"] = "andy753421@gmail.com"
 	mail["andy"]       = "andy@gmail.com"
 	mail["somebody"]   = "foo@example.com"
-	print "mail: "  json_write_value(mail, "      ")
+	print "mail: "  json_encode(mail, "      ")
 	print "save: [" json_save("email.txt", mail) "]"
 }
 
