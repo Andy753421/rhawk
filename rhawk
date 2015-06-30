@@ -424,7 +424,8 @@ tolower($0) ~ /\<nuclear launch detected\>/ {
 }
 
 # Vote relay
-DST != "#rhnoise" && /\<[a-zA-Z0-9_]{3,16}(\+\+|--)/ {
+DST != "#rhnoise" && DST != NICK &&
+/\<[a-zA-Z0-9_]{3,16}(\+\+|--)/ {
 	say("#rhnoise", "(" DST ") " FROM ": " MSG);
 }
 
