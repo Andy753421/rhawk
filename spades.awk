@@ -61,6 +61,7 @@ function sp_reset(type)
 
 	# Persistent
 	if (type >= 3) {
+		sp_log      = ""    #     Log file name
 		delete sp_notify    # [p] E-mail notification address
 	}
 }
@@ -99,6 +100,7 @@ function sp_save(file,	game)
 	game["turn"]    = sp_turn;
 	game["player"]  = sp_player;
 	game["limit"]   = sp_limit;
+	game["log"]     = sp_log;
 	json_copy(game, "hands",   sp_hands);
 	json_copy(game, "players", sp_players);
 	json_copy(game, "auths",   sp_auths);
@@ -140,6 +142,7 @@ function sp_load(file,	game)
 	sp_turn    = game["turn"];
 	sp_player  = game["player"];
 	sp_limit   = game["limit"];
+	sp_log     = game["log"];
 	sp_acopy(sp_hands,   game["hands"]);
 	sp_acopy(sp_players, game["players"]);
 	sp_acopy(sp_auths,   game["auths"]);
@@ -147,6 +150,13 @@ function sp_load(file,	game)
 	sp_acopy(sp_order,   game["order"]);
 	sp_acopy(sp_scores,  game["scores"]);
 	sp_acopy(sp_notify,  game["notify"]);
+}
+
+function sp_say(msg)
+{
+	print strftime("%Y-%m-%d %H:%M:%S | ") msg >> "logs/" sp_log
+	fflush("logs/" sp_log)
+	say(sp_channel, msg);
 }
 
 function sp_pretty(cards, who)
@@ -184,7 +194,7 @@ function sp_shuf(i, mixed)
 
 function sp_deal(	shuf)
 {
-	say("/me deals the cards")
+	sp_say("/me deals the cards")
 	sp_usort(sp_deck, shuf)
 	for (i=1; i<=52; i++)
 		sp_hands[sp_order[i%4]][shuf[i]] = 1
@@ -192,7 +202,7 @@ function sp_deal(	shuf)
 	sp_dealer = (sp_dealer+1)%4
 	sp_turn   =  sp_dealer
 	sp_player =  sp_order[sp_turn]
-	say(sp_player ": you bid first!")
+	sp_say(sp_player ": you bid first!")
 }
 
 function sp_hand(to, who,	sort, str)
@@ -285,21 +295,21 @@ function sp_score(	bids, times, tricks)
 		bags   = tricks - bids
 		times  = int((sp_bags(i) + bags) / sp_limit)
 		if (times > 0) {
-			say(sp_team(i) " bag" (times>1?" way ":" ") "out")
+			sp_say(sp_team(i) " bag" (times>1?" way ":" ") "out")
 			sp_scores[i] -= sp_limit * 10 * times;
 		}
 		if (tricks >= bids) {
-			say(sp_team(i) " make their bid: " tricks "/" bids)
+			sp_say(sp_team(i) " make their bid: " tricks "/" bids)
 			sp_scores[i] += bids*10 + bags;
 		} else {
-			say(sp_team(i) " go bust: " tricks "/" bids)
+			sp_say(sp_team(i) " go bust: " tricks "/" bids)
 			sp_scores[i] -= bids*10;
 		}
 	}
 	for (i=0; i<4; i++) {
 		if (!sp_nil[i])
 			continue
-		say(sp_order[i] " " \
+		sp_say(sp_order[i] " " \
 		    (sp_nil[i] == 1 && !sp_tricks[i] ? "makes nil!"       :
 		     sp_nil[i] == 1 &&  sp_tricks[i] ? "fails at nil!"    :
 		     sp_nil[i] == 2 && !sp_tricks[i] ? "makes blind nil!" :
@@ -309,11 +319,11 @@ function sp_score(	bids, times, tricks)
 			(sp_tricks[i] == 0 ? 1 : -1)
 	}
 	if (sp_scores[0] > sp_scores[1])
-		say(sp_team(0) " lead " sp_scores[0] " to " sp_scores[1] " of " sp_playto)
+		sp_say(sp_team(0) " lead " sp_scores[0] " to " sp_scores[1] " of " sp_playto)
 	else if (sp_scores[1] > sp_scores[0])
-		say(sp_team(1) " lead " sp_scores[1] " to " sp_scores[0] " of " sp_playto)
+		sp_say(sp_team(1) " lead " sp_scores[1] " to " sp_scores[0] " of " sp_playto)
 	else
-		say("tied at " sp_scores[0] " of "  " of " sp_playto)
+		sp_say("tied at " sp_scores[0] " of " sp_playto)
 }
 
 function sp_play(card,	winner, pi)
@@ -335,8 +345,8 @@ function sp_play(card,	winner, pi)
 		winner = sp_winner()
 		pi     = sp_players[sp_pile[winner]]
 		sp_tricks[pi]++
-		say(sp_pile[winner] " wins with " sp_pretty(winner, FROM) \
-		    " (" sp_pretty(sp_piles, FROM) ")")
+		sp_say(sp_pile[winner] " wins with " sp_pretty(winner, FROM) \
+		       " (" sp_pretty(sp_piles, FROM) ")")
 		sp_last = sp_pile[winner] " took " sp_piles
 		sp_next(sp_pile[winner])
 		sp_reset(0)
@@ -345,11 +355,11 @@ function sp_play(card,	winner, pi)
 	# Finish round
 	if (sp_tricks[0] + sp_tricks[1] + \
 	    sp_tricks[2] + sp_tricks[3] == 13) {
-		say("Round over!")
+		sp_say("Round over!")
 		sp_score()
 		if (sp_scores[0] >= sp_playto || sp_scores[1] >= sp_playto &&
 		    sp_scores[0]              != sp_scores[1]) {
-			say("Game over!")
+			sp_say("Game over!")
 			winner = sp_scores[0] > sp_scores[1] ? 0 : 1
 			looser = !winner
 			say(CHANNEL, sp_team(winner) " wins the game " \
@@ -361,7 +371,7 @@ function sp_play(card,	winner, pi)
 		} else {
 			if (sp_scores[0] == sp_scores[1] && 
 			    sp_scores[0] >= sp_playto)
-				say("It's tie! Playing an extra round!");
+				sp_say("It's tie! Playing an extra round!");
 			sp_reset(1)
 			sp_deal()
 		}
@@ -378,7 +388,7 @@ BEGIN {
 	sp_reset(2)
 	sp_load("var/sp_cur.json");
 	#if (sp_channel)
-	#	say(sp_channel, "Game restored.")
+	#	sp_say("Game restored.")
 }
 
 // {
@@ -452,7 +462,7 @@ AUTH == OWNER &&
 # Debugging
 AUTH == OWNER &&
 /^\.deal (\w+) (.*)/ {
-	say(sp_channel, FROM " is cheating for " $2)
+	sp_say(FROM " is cheating for " $2)
 	delete sp_hands[$2]
 	for (i=3; i<=NF; i++)
 		sp_hands[$2][$i] = 1
@@ -461,7 +471,7 @@ AUTH == OWNER &&
 
 AUTH == OWNER &&
 /^\.order (\w+) ([0-4])/ {
-	say(sp_channel, FROM " is cheating for " $2)
+	sp_say(FROM " is cheating for " $2)
 	sp_order[$3] = $2
 	sp_players[$2] = $3
 	sp_player = sp_order[sp_turn]
@@ -470,7 +480,7 @@ AUTH == OWNER &&
 AUTH == OWNER &&
 sp_state == "play" &&
 /^\.force (\w+) (\S+)$/ {
-	say(sp_channel, FROM " is cheating for " $2)
+	sp_say(FROM " is cheating for " $2)
 	sp_from = $2
 	sp_play($3)
 	next
@@ -493,7 +503,8 @@ match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 		sp_limit   = sp_playto > 200 ? 10 : 5;
 		sp_state   = "join"
 		sp_channel = DST
-		say(sp_owner " starts a game of Spades to " sp_playto " with " sp_limit " bags!")
+		sp_log     = strftime("%Y%m%d_%H%M%S.log")
+		sp_say(sp_owner " starts a game of Spades to " sp_playto " with " sp_limit " bags!")
 	}
 }
 
@@ -502,7 +513,7 @@ match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 	if (sp_state == "new") {
 		reply("There is no game in progress.")
 	} else {
-		say(FROM " ends the game")
+		sp_say(FROM " ends the game")
 		sp_reset(2)
 	}
 }
@@ -523,7 +534,7 @@ match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 		if (AUTH)
 			sp_auths[AUTH] = FROM
 		sp_order[i] = FROM
-		say(FROM " joins the game!")
+		sp_say(FROM " joins the game!")
 	}
 	if (sp_state == "join" && sp_turn == 0) {
 		sp_shuf()
@@ -550,7 +561,7 @@ match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 		reply(_str " is already playing for " sp_share[_who])
 	}
 	else {
-		reply(_str " can now play for " sp_from)
+		sp_say(_str " can now play for " sp_from)
 		sp_share[_who] = sp_from
 	}
 }
@@ -571,7 +582,7 @@ match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 		reply(_str " is not playing for " sp_from)
 	}
 	else {
-		reply(_str " can no longer play for " sp_from)
+		sp_say(_str " can no longer play for " sp_from)
 		delete sp_share[_who]
 	}
 }
@@ -605,16 +616,16 @@ sp_state ~ "(bid|pass|play)" &&
 	for (_i in sp_share)
 		_lines[sp_share[_i]] = _lines[sp_share[_i]] " " _i
 	for (_i in _lines)
-		say(_i " allowed:" _lines[_i])
+		sp_say(_i " allowed:" _lines[_i])
 }
 
 !sp_valid &&
 (sp_state == "bid" || sp_state == "play") &&
 /^\.(bid|play)\>/ {
 	if (sp_from in sp_players)
-		say(".slap " FROM ", it is not your turn.")
+		reply("It is not your turn.")
 	else
-		say(".slap " FROM ", you are not playing.")
+		reply("You are not playing.")
 }
 
 sp_valid &&
@@ -626,29 +637,29 @@ sp_state == "bid" &&
 		i = sp_next()
 		sp_bids[i] = $2
 		if ($2 == 0 && !sp_looked[i]) {
-			say(FROM " goes blind nil!")
+			sp_say(FROM " goes blind nil!")
 			sp_nil[i] = 2
 		} else if ($2 == 0) {
-			say(FROM " goes nil!")
+			sp_say(FROM " goes nil!")
 			sp_nil[i] = 1
 		} else {
 			sp_nil[i] = 0
 		}
 		if (sp_turn != sp_dealer) {
-			say(sp_player ": it is your bid! (" sp_bidders() ")")
+			sp_say(sp_player ": it is your bid! (" sp_bidders() ")")
 		} else {
 			for (p in sp_players)
 				say(p, "You have: " sp_hand(p, p))
 			sp_state = "play"
 			for (i=0; i<2; i++) {
 				if (sp_passer(i)) {
-					say(sp_team(i) ": select a card to pass " \
+					sp_say(sp_team(i) ": select a card to pass " \
 					    "(/msg " NICK " .pass <card>)")
 					sp_state = "pass"
 				}
 			}
 			if (sp_state == "play")
-				say(sp_player ": you have the opening lead!")
+				sp_say(sp_player ": you have the opening lead!")
 		}
 	}
 }
@@ -660,7 +671,7 @@ sp_state == "pass" &&
 
 	# check validity and pass
 	if (!(sp_from in sp_players)) {
-		say(".slap " FROM ", you are not playing.")
+		reply("You are not playing.")
 	}
 	else if (!sp_passer(_team)) {
 		reply("Your team did not go blind")
@@ -676,7 +687,7 @@ sp_state == "pass" &&
 	}
 	else {
 		sp_pass[sp_players[sp_from]] = $2
-		say(sp_channel, FROM " passes a card")
+		sp_say(FROM " passes a card")
 	}
 
 	# check for end of passing
@@ -688,8 +699,8 @@ sp_state == "pass" &&
 			delete sp_hands[sp_order[i]][_card]
 			sp_hands[sp_order[_partner]][_card] = 1
 		}
-		say(sp_channel, "Cards have been passed!")
-		say(sp_channel, sp_player ": you have the opening lead!")
+		sp_say("Cards have been passed!")
+		sp_say(sp_player ": you have the opening lead!")
 		for (p in sp_players)
 			say(p, "You have: " sp_hand(p, p))
 		sp_state = "play"
@@ -699,7 +710,7 @@ sp_state == "pass" &&
 sp_state ~ "(bid|pass|play)" &&
 /^\.look$/ {
 	if (!(sp_from in sp_players)) {
-		say(".slap " FROM ", you are not playing.")
+		reply("You are not playing.")
 	} else {
 		sp_looked[sp_players[sp_from]] = 1
 		say(FROM, "You have: " sp_hand(FROM, sp_from))
@@ -732,10 +743,10 @@ sp_state == "play" &&
 			if (length(sp_hands[sp_from]))
 				say(FROM, "You have: " sp_hand(FROM, sp_from))
 			if (sp_piles)
-				say(sp_player ": it is your turn! " \
+				sp_say(sp_player ": it is your turn! " \
 				    "(" sp_pretty(sp_piles, sp_player) ")")
 			else
-				say(sp_player ": it is your turn!")
+				sp_say(sp_player ": it is your turn!")
 		}
 	}
 }
@@ -824,6 +835,11 @@ sp_state == "play" &&
 		    int(sp_scores[1]) " points, " \
 		    int(sp_bags(1))   " bags")
 	}
+}
+
+(DST == sp_channel) &&
+/^\.log/ {
+	say("http://pileus.org/andy/spades/" sp_log)
 }
 
 /^\.((new|end|load)game|join|look|bid|pass|play|notify)/ {
