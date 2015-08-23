@@ -313,7 +313,7 @@ function sp_score(	bids, times, tricks)
 	else if (sp_scores[1] > sp_scores[0])
 		say(sp_team(1) " lead " sp_scores[1] " to " sp_scores[0] " of " sp_playto)
 	else
-		say("tied at " sp_scores[0])
+		say("tied at " sp_scores[0] " of "  " of " sp_playto)
 }
 
 function sp_play(card,	winner, pi)
