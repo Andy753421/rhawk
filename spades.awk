@@ -507,7 +507,7 @@ match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 	}
 }
 
-/^\.join$/ {
+/^\.join/ {
 	if (sp_state == "new") {
 		reply("There is no game in progress")
 	}
