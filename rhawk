@@ -429,6 +429,24 @@ DST != "#rhnoise" && DST != NICK &&
 	say("#rhnoise", "(" DST ") " FROM ": " MSG);
 }
 
+# Fun operators
+function bang(a, b) {
+	if (a=="nan") return "nan";
+	if (b=="nan") return "nan";
+	if (a==b)     return "nan";
+	if (a==0)     return "+0";
+	if (b==0)     return "-0";
+	return 1/(1/a - 1/b);
+}
+
+/^ *[+-]?[0-9]*\.?[0-9]+( *\? *[+-]?[0-9]*\.?[0-9]+)+ *$/ {
+	gsub(/?/, " ");
+	_num = $1+0;
+	for (_i=2; _i<=NF; _i++)
+		_num = bang(_num, $_i+0);
+	reply(_num);
+}
+
 # Misc
 { fflush("") }
 
