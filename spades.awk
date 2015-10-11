@@ -33,7 +33,7 @@ function sp_reset(type)
 	if (type >= 1) {
 		sp_state    = "bid" #     {new,join,bid,pass,play}
 		sp_broken   = 0     #     Whether spades are broken
-		sp_last     = ""    #     The result of the last hand
+		delete sp_last      # [x] The result of the last hand
 		delete sp_hands     # [p] Each players cards
 		delete sp_looked    # [i] Whether a player has looked a their cards
 		delete sp_bids      # [i] Each players bid
@@ -85,7 +85,7 @@ function sp_save(file,	game)
 	# Per round
 	game["state"]   = sp_state;
 	game["broken"]  = sp_broken;
-	game["last"]    = sp_last;
+	json_copy(game, "last",    sp_last);
 	json_copy(game, "looked",  sp_looked);
 	json_copy(game, "bids",    sp_bids);
 	json_copy(game, "nil",     sp_nil);
@@ -127,7 +127,7 @@ function sp_load(file,	game)
 	# Per round
 	sp_state   = game["state"];
 	sp_broken  = game["broken"];
-	sp_last    = game["last"];
+	sp_acopy(sp_last,    game["last"]);
 	sp_acopy(sp_looked,  game["looked"]);
 	sp_acopy(sp_bids,    game["bids"]);
 	sp_acopy(sp_nil,     game["nil"]);
@@ -347,7 +347,8 @@ function sp_play(card,	winner, pi)
 		sp_tricks[pi]++
 		sp_say(sp_pile[winner] " wins with " sp_pretty(winner, FROM) \
 		       " (" sp_pretty(sp_piles, FROM) ")")
-		sp_last = sp_pile[winner] " took " sp_piles
+		sp_last["player"] = sp_pile[winner];
+		sp_last["pile"]   = sp_piles;
 		sp_next(sp_pile[winner])
 		sp_reset(0)
 	}
@@ -752,10 +753,11 @@ sp_state == "play" &&
 }
 
 /^\.last/ && sp_state == "play" {
-	if (!sp_last)
+	if (!isarray(sp_last))
 		say("No tricks have been taken!");
 	else
-		say(sp_pretty(sp_last, FROM));
+		say(sp_last["player"] " took " \
+		    sp_pretty(sp_last["pile"], FROM));
 }
 
 /^\.bids/ && sp_state == "bid" ||
