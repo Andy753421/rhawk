@@ -7,9 +7,12 @@ CPPFLAGS = -I/usr/include/awk \
            -DHAVE_STDBOOL_H   \
            -DHAVE_STDDEF_H
 
-default: select.so
+default:V: stats
 
-test:Q:
+stats:QV:
+	awk -f stats.awk
+
+test:QV:
 	rm -f var/sp_cur.json
 	#awk -f rhawk < testirc.txt
 	#awk -f rhawk < testirc.txt

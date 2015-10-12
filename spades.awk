@@ -379,6 +379,63 @@ function sp_play(card,	winner, pi)
 	}
 }
 
+# Statistics
+function sp_delay(sec)
+{
+	return (sec > 60*60*24 ? int(sec/60/60/24) "d " : "") \
+	       (sec > 60*60    ? int(sec/60/60)%24 "h " : "") \
+	                         int(sec/60)%60    "m"      
+}
+
+function sp_max(list,    i, max)
+{
+	for (i=0; i<length(list); i++)
+		if (max == "" || list[i] > max)
+			max = list[i]
+	return max
+}
+
+function sp_avg(list,    i, sum)
+{
+	for (i=0; i<length(list); i++)
+		sum += list[i]
+	return sum / length(list)
+}
+
+function sp_stats(file,   line, arr, time, user, turn, start, delay)
+{
+	# Process log file
+	while (getline line < file) {
+		# Parse date
+		if (!match(line, /^([0-9\- \:]*) \| (.*)$/, arr))
+			continue
+		gsub(/[:-]/, " ", arr[1])
+		time = mktime(arr[1])
+
+		# Parse user
+		if (!match(arr[2], /^([^:]*): (.*)$/, arr))
+			continue
+		user = arr[1]
+
+		# Record user latency
+		if (turn) {
+			delay[turn][length(delay[turn])] = time - start
+			turn  = 0
+		}
+		if (match(arr[2], /^it is your.*$/, arr)) {
+			turn  = user
+			start = time
+		} 
+	}
+
+	# Output statistics
+	for (user in delay) {
+		say("latency for " user \
+			": " sp_delay(sp_avg(delay[user])) " (avg)" \
+			", " sp_delay(sp_max(delay[user])) " (max)")
+	}
+}
+
 # Misc
 BEGIN {
 	cmd = "od -An -N4 -td4 /dev/random"
@@ -842,6 +899,11 @@ sp_state == "play" &&
 (DST == sp_channel) &&
 /^\.log/ {
 	say("http://pileus.org/andy/spades/" sp_log)
+}
+
+(DST == sp_channel) &&
+/^\.stats/ {
+	sp_stats("logs/" sp_log);
 }
 
 /^\.((new|end|load)game|join|look|bid|pass|play|notify)/ {
