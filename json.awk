@@ -305,6 +305,7 @@ function json_encode(var, pad)
 # File API
 function json_load(file, var,   line, string)
 {
+	delete var
 	while ((getline line < file) > 0)
 		string = string line "\n"
 	return json_decode(string, var)

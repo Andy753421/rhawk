@@ -4,6 +4,7 @@
 @include "json.awk"
 @include "spades.awk"
 @include "email.awk"
+@include "remind.awk"
 @include "sfvlug.awk"
 
 # Initialization
