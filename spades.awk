@@ -44,7 +44,6 @@ function sp_reset(type)
 
 	# Per game
 	if (type >= 2) {
-		sp_channel  = ""    #     channel to play in
 		sp_state    = "new" #     {new,join,bid,pass,play}
 		sp_owner    = ""    #     Who started the game
 		sp_playto   = 0     #     Score the game will go to
@@ -61,6 +60,7 @@ function sp_reset(type)
 
 	# Persistent
 	if (type >= 3) {
+		sp_channel  = ""    #     channel to play in
 		sp_log      = ""    #     Log file name
 		delete sp_notify    # [p] E-mail notification address
 	}
@@ -93,20 +93,22 @@ function sp_save(file,	game)
 	json_copy(game, "tricks",  sp_tricks);
 
 	# Per game
-	game["channel"] = sp_channel;
 	game["owner"]   = sp_owner;
 	game["playto"]  = sp_playto;
 	game["dealer"]  = sp_dealer;
 	game["turn"]    = sp_turn;
 	game["player"]  = sp_player;
 	game["limit"]   = sp_limit;
-	game["log"]     = sp_log;
 	json_copy(game, "hands",   sp_hands);
 	json_copy(game, "players", sp_players);
 	json_copy(game, "auths",   sp_auths);
 	json_copy(game, "share",   sp_share);
 	json_copy(game, "order",   sp_order);
 	json_copy(game, "scores",  sp_scores);
+
+	# Persistent
+	game["channel"] = sp_channel;
+	game["log"]     = sp_log;
 	json_copy(game, "notify",  sp_notify);
 
 	# Save
@@ -135,20 +137,22 @@ function sp_load(file,	game)
 	sp_acopy(sp_tricks,  game["tricks"]);
 
 	# Per game
-	sp_channel = game["channel"];
 	sp_owner   = game["owner"];
 	sp_playto  = game["playto"];
 	sp_dealer  = game["dealer"];
 	sp_turn    = game["turn"];
 	sp_player  = game["player"];
 	sp_limit   = game["limit"];
-	sp_log     = game["log"];
 	sp_acopy(sp_hands,   game["hands"]);
 	sp_acopy(sp_players, game["players"]);
 	sp_acopy(sp_auths,   game["auths"]);
 	sp_acopy(sp_share,   game["share"]);
 	sp_acopy(sp_order,   game["order"]);
 	sp_acopy(sp_scores,  game["scores"]);
+
+	# Persistent
+	sp_channel = game["channel"];
+	sp_log     = game["log"];
 	sp_acopy(sp_notify,  game["notify"]);
 }
 
@@ -405,7 +409,7 @@ function sp_avg(list,    i, sum)
 function sp_stats(file,   line, arr, time, user, turn, start, delay)
 {
 	# Process log file
-	while (getline line < file) {
+	while ((stat = getline line < file) > 0) {
 		# Parse date
 		if (!match(line, /^([0-9\- \:]*) \| (.*)$/, arr))
 			continue
@@ -427,6 +431,11 @@ function sp_stats(file,   line, arr, time, user, turn, start, delay)
 			start = time
 		} 
 	}
+	close(file)
+
+	# Check for error
+	if (stat < 0)
+		reply("File does not exist: " file);
 
 	# Output statistics
 	for (user in delay) {
@@ -896,14 +905,20 @@ sp_state == "play" &&
 	}
 }
 
-(DST == sp_channel) &&
+(TO == NICK || DST == sp_channel) &&
 /^\.log/ {
 	say("http://pileus.org/andy/spades/" sp_log)
 }
 
-(DST == sp_channel) &&
-/^\.stats/ {
+(TO == NICK || DST == sp_channel) &&
+/^\.stats$/ {
 	sp_stats("logs/" sp_log);
+}
+
+(TO == NICK || DST == sp_channel) &&
+/^\.stats ([0-9]+_[0-9]+)(\.log)$/ {
+	gsub(/\.log$/, "", $2);
+	sp_stats("logs/" $2 ".log");
 }
 
 /^\.((new|end|load)game|join|look|bid|pass|play|notify)/ {
