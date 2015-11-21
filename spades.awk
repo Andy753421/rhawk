@@ -291,6 +291,15 @@ function sp_bidders(	i, turn, bid, bids)
 	return bids
 }
 
+function sp_extra(	n, s)
+{
+	n = sp_bids[0] + sp_bids[1] + sp_bids[2] + sp_bids[3];
+	s = n == 12 || n == 14 ? "" : "s";
+
+	return n<13 ? "Playing with " 13-n " bag"   s "!" :
+	       n>13 ? "Fighting for " n-13 " trick" s "!" : "No bags!";
+}
+
 function sp_score(	bids, times, tricks)
 {
 	for (i=0; i<2; i++) {
@@ -715,6 +724,7 @@ sp_state == "bid" &&
 		if (sp_turn != sp_dealer) {
 			sp_say(sp_player ": it is your bid! (" sp_bidders() ")")
 		} else {
+			sp_say(sp_extra() " (" sp_bidders() ")")
 			for (p in sp_players)
 				say(p, "You have: " sp_hand(p, p))
 			sp_state = "play"
