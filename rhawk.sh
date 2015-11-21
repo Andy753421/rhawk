@@ -1,4 +1,6 @@
 #!/bin/bash
+
+export PATH=$PATH:~/bin
 KEEPALIVE="keepalive,keepidle=240,keepcnt=1,keepintvl=1"
 cd /home/andy/src/rhawk
 while true; do
