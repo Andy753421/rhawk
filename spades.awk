@@ -663,6 +663,15 @@ match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 	}
 }
 
+/^\.whoami/ {
+	if (!(sp_from in sp_players))
+		reply("You are not playing")
+	else if (sp_from == FROM)
+		say(FROM " has an existential crisis")
+	else
+		reply("You are playing for " sp_from);
+}
+
 /^\.notify$/ {
 	if (sp_from in sp_notify)
 		reply("Your address is " sp_notify[sp_from])
