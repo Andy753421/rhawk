@@ -383,7 +383,7 @@ function sp_play(card,	winner, pi)
 			sp_reset(2)
 
 		} else {
-			if (sp_scores[0] == sp_scores[1] && 
+			if (sp_scores[0] == sp_scores[1] &&
 			    sp_scores[0] >= sp_playto)
 				sp_say("It's tie! Playing an extra round!");
 			sp_reset(1)
@@ -397,7 +397,7 @@ function sp_delay(sec)
 {
 	return (sec > 60*60*24 ? int(sec/60/60/24) "d " : "") \
 	       (sec > 60*60    ? int(sec/60/60)%24 "h " : "") \
-	                         int(sec/60)%60    "m"      
+	                         int(sec/60)%60    "m"
 }
 
 function sp_max(list,    i, max)
@@ -438,7 +438,7 @@ function sp_stats(file,   line, arr, time, user, turn, start, delay)
 		if (match(arr[2], /^it is your.*$/, arr)) {
 			turn  = user
 			start = time
-		} 
+		}
 	}
 	close(file)
 
