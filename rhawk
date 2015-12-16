@@ -28,6 +28,8 @@ BEGIN {
 		join("#rhspades")
 		join("#sfvlug")
 	}
+
+	PROCINFO["sorted_in"] = "@ind_str_asc";
 }
 
 # Admin
