@@ -415,7 +415,12 @@ function sp_avg(list,    i, sum)
 	return sum / length(list)
 }
 
-function sp_stats(file,   line, arr, time, user, turn, start, delay)
+function sp_cur(list)
+{
+	return list[length(list)-1]
+}
+
+function sp_stats(file,   line, arr, time, user, turn, start, delay, extra)
 {
 	# Process log file
 	while ((stat = getline line < file) > 0) {
@@ -435,12 +440,18 @@ function sp_stats(file,   line, arr, time, user, turn, start, delay)
 			delay[turn][length(delay[turn])] = time - start
 			turn  = 0
 		}
-		if (match(arr[2], /^it is your.*$/, arr)) {
+		if (match(arr[2], /^(it is your|you .*(first|lead)!$)/, arr)) {
 			turn  = user
 			start = time
 		}
 	}
 	close(file)
+
+	# Add current latency
+	if (turn) {
+		delay[turn][length(delay[turn])] = systime() - start
+		debug("time: " (systime() - start))
+	}
 
 	# Check for error
 	if (stat < 0)
@@ -448,9 +459,11 @@ function sp_stats(file,   line, arr, time, user, turn, start, delay)
 
 	# Output statistics
 	for (user in delay) {
+		extra = (user != turn) ? "" : \
+			", " sp_delay(sp_cur(delay[user])) " (cur)";
 		say("latency for " user \
 			": " sp_delay(sp_avg(delay[user])) " (avg)" \
-			", " sp_delay(sp_max(delay[user])) " (max)")
+			", " sp_delay(sp_max(delay[user])) " (max)" extra)
 	}
 }
 
