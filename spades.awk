@@ -62,6 +62,7 @@ function sp_reset(type)
 	if (type >= 3) {
 		sp_channel  = ""    #     channel to play in
 		sp_log      = ""    #     Log file name
+		sp_sock     = ""    #     UDP log socket
 		delete sp_notify    # [p] E-mail notification address
 	}
 }
@@ -160,7 +161,8 @@ function sp_say(msg)
 {
 	print strftime("%Y-%m-%d %H:%M:%S | ") msg >> "logs/" sp_log
 	fflush("logs/" sp_log)
-	say(sp_channel, msg);
+	say(sp_channel, msg)
+	print msg |& sp_sock
 }
 
 function sp_pretty(cards, who)
@@ -475,7 +477,9 @@ BEGIN {
 	srand(seed)
 	sp_init()
 	sp_reset(2)
-	sp_load("var/sp_cur.json");
+	sp_load("var/sp_cur.json")
+	sp_sock = "/inet/udp/0/localhost/6173"
+	print "starting rhawk" |& sp_sock
 	#if (sp_channel)
 	#	sp_say("Game restored.")
 }
