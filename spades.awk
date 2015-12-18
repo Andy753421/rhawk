@@ -718,7 +718,7 @@ sp_state ~ "(bid|pass|play)" &&
 	for (_i in sp_share)
 		_lines[sp_share[_i]] = _lines[sp_share[_i]] " " _i
 	for (_i in _lines)
-		sp_say(_i " allowed:" _lines[_i])
+		say(_i " allowed:" _lines[_i])
 }
 
 !sp_valid &&
