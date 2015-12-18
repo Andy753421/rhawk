@@ -864,13 +864,21 @@ sp_state == "play" &&
 
 /^\.bids/ && sp_state == "bid" ||
 /^\.turn/ && sp_state ~ "(bid|pass|play)" {
-	_bids  = sp_bidders()
-	_pile  = sp_pretty(sp_piles, FROM)
-	_extra = ""
+	_bids   = sp_bidders()
+	_pile   = sp_pretty(sp_piles, FROM)
+	_extra  = ""
+	delete _notify
 
-	for (_i in sp_share)
-		if (/!/ && sp_share[_i] == sp_player)
+	if (/!!/)
+		_notify[0] = sp_player
+	for (_i in sp_share) {
+		if (sp_share[_i] != sp_player)
+			continue
+		if (/!/)
 			_extra = _extra " " _i "!"
+		if (/!!!/)
+			_notify[length(_notify)] = _i
+	}
 
 	if (sp_state == "bid" && !_bids)
 		say("It is " sp_player "'s bid!" _extra)
@@ -881,23 +889,25 @@ sp_state == "play" &&
 	if (sp_state == "play" && _pile)
 		say("It is " sp_player "'s turn!" _extra " (" _pile ")")
 
+	if (sp_state == "bid" || sp_state == "play") {
+		for (_i in _notify) {
+			if (_notify[_i] in sp_notify) {
+				_bids = _bids ? _bids    : "none"
+				_pile = _pile ? sp_piles : "none"
+				mail_send(sp_notify[_notify[_i]],     \
+					"It is your " sp_state "!", \
+					"Bids so far:  " _bids "\n" \
+					"Cards played: " _pile)
+				say("Notified " _notify[_i] " at " sp_notify[_notify[_i]])
+			} else {
+				say("No email address for " _notify[_i])
+			}
+		}
+	}
+
 	for (_i=0; sp_state == "pass" && _i<4; _i++)
 		if (sp_passer(_i) && !sp_pass[_i])
 			say("Waiting for " sp_order[_i] " to pass a card!")
-
-	if (/!!/ && (sp_state == "bid" || sp_state == "play")) {
-		if (sp_player in sp_notify) {
-			_bids = _bids ? _bids    : "none"
-			_pile = _pile ? sp_piles : "none"
-			mail_send(sp_notify[sp_player],     \
-				"It is your " sp_state "!", \
-				"Bids so far:  " _bids "\n" \
-				"Cards played: " _pile)
-			say("Notified " sp_player " at " sp_notify[sp_player])
-		} else {
-			say("No email address for " sp_player)
-		}
-	}
 }
 
 /^\.bids$/ && sp_state ~ "(pass|play)" {
