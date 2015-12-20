@@ -2,5 +2,8 @@
 *.swp
 *.so
 *.o
+var/
+debug/
+logs/
 spades.txt
 config.h
