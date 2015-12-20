@@ -159,10 +159,10 @@ function sp_load(file,	game)
 
 function sp_say(msg)
 {
-	print strftime("%Y-%m-%d %H:%M:%S | ") msg >> "logs/" sp_log
-	fflush("logs/" sp_log)
 	say(sp_channel, msg)
 	print msg |& sp_sock
+	print strftime("%Y-%m-%d %H:%M:%S | ") msg >> "logs/" sp_log
+	fflush("logs/" sp_log)
 }
 
 function sp_pretty(cards, who)
