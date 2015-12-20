@@ -89,9 +89,9 @@ function mail_save(file)
 
 /^\.help e?mail$/ {
 	say("Mail -- email users when they are mentioned")
-	say(".subscribe [addr] -- set your mailing address to [addr]")
-	say(".unsubscribe [addr] -- remove your subscription")
-	say(".addresses -- show your subscription address")
+	say(NICK ": subscribe [addr] -- set your mailing address to [addr]")
+	say(NICK ": unsubscribe [addr] -- remove your subscription")
+	say(NICK ": addresses -- show your subscription address")
 	next
 }
 
