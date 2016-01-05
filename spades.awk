@@ -422,7 +422,7 @@ function sp_cur(list)
 	return list[length(list)-1]
 }
 
-function sp_stats(file,   line, arr, time, user, turn, start, delay, extra)
+function sp_stats(file,   line, arr, time, user, turn, start, delay, short, extra)
 {
 	# Process log file
 	while ((stat = getline line < file) > 0) {
@@ -461,9 +461,10 @@ function sp_stats(file,   line, arr, time, user, turn, start, delay, extra)
 
 	# Output statistics
 	for (user in delay) {
+		short = length(user) <= 4 ? user : substr(user, 0, 4)
 		extra = (user != turn) ? "" : \
 			", " sp_delay(sp_cur(delay[user])) " (cur)";
-		say("latency for " user \
+		say("latency for " short \
 			": " sp_delay(sp_avg(delay[user])) " (avg)" \
 			", " sp_delay(sp_max(delay[user])) " (max)" extra)
 	}
