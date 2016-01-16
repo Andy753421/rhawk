@@ -56,6 +56,7 @@ function sp_reset(type)
 		delete sp_share     # [c] Player teammates share["friend"] -> "name"
 		delete sp_order     # [i] Player order order[i] -> "name"
 		delete sp_scores    # [i] Teams score
+		delete sp_teams     # [i] Teams names
 	}
 
 	# Persistent
@@ -106,6 +107,7 @@ function sp_save(file,	game)
 	json_copy(game, "share",   sp_share);
 	json_copy(game, "order",   sp_order);
 	json_copy(game, "scores",  sp_scores);
+	json_copy(game, "teams",   sp_teams);
 
 	# Persistent
 	game["channel"] = sp_channel;
@@ -150,6 +152,7 @@ function sp_load(file,	game)
 	sp_acopy(sp_share,   game["share"]);
 	sp_acopy(sp_order,   game["order"]);
 	sp_acopy(sp_scores,  game["scores"]);
+	sp_acopy(sp_teams,   game["teams"]);
 
 	# Persistent
 	sp_channel = game["channel"];
@@ -255,10 +258,13 @@ function sp_winner(	card, tmp)
 	return tmp[1]
 }
 
-function sp_team(i)
+function sp_team(i, players)
 {
 	#return "{" sp_order[i+0] "," sp_order[i+2] "}"
-	return sp_order[i+0] "/" sp_order[i+2]
+	if ((i in sp_teams) && !players)
+		return sp_teams[i]
+	else
+		return sp_order[i+0] "/" sp_order[i+2]
 }
 
 function sp_bags(i,	bags)
@@ -536,6 +542,7 @@ AUTH == OWNER &&
 	say(".bid [n] -- bid for <n> tricks")
 	say(".pass [card] -- pass a card to your partner")
 	say(".play [card] -- play a card")
+	say(".team [name] -- set your team name")
 	say(".last -- show who took the previous trick")
 	say(".turn -- check whose turn it is")
 	say(".bids -- check what everyone bid")
@@ -681,6 +688,28 @@ match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 	}
 }
 
+/^\.team/ {
+	gsub(/^\.team */, "")
+	_team = sp_from in sp_players ? sp_players[sp_from] % 2 : 0
+	if (sp_state ~ "new|join") {
+		reply("The game has not yet started")
+	}
+	else if (!(sp_from in sp_players)) {
+		reply("You are not playing")
+	}
+	else if ($0 ~ /^[^a-zA-Z0-9]/) {
+		reply("Invalid team name")
+	}
+	else if ($0 ~ /^./) {
+		sp_teams[_team] = substr($0, 0, 32)
+		sp_say(sp_team(_team,1) " are now known as " sp_team(_team))
+	}
+	else {
+		delete sp_teams[_team]
+		sp_say(sp_team(_team,1) " are boring")
+	}
+}
+
 /^\.whoami/ {
 	if (!(sp_from in sp_players))
 		reply("You are not playing")
@@ -757,7 +786,7 @@ sp_state == "bid" &&
 			sp_state = "play"
 			for (i=0; i<2; i++) {
 				if (sp_passer(i)) {
-					sp_say(sp_team(i) ": select a card to pass " \
+					sp_say(sp_team(i,1) ": select a card to pass " \
 					    "(/msg " NICK " .pass <card>)")
 					sp_state = "pass"
 				}
@@ -968,6 +997,6 @@ sp_state == "play" &&
 	sp_stats("logs/" $2 ".log");
 }
 
-/^\.((new|end|load)game|join|look|bid|pass|play|notify)/ {
+/^\.((new|end|load)game|join|look|bid|pass|play|allow|deny|team|notify)/ {
 	sp_save("var/sp_cur.json");
 }
