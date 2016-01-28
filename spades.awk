@@ -379,8 +379,8 @@ function sp_play(card,	winner, pi)
 	    sp_tricks[2] + sp_tricks[3] == 13) {
 		sp_say("Round over!")
 		sp_score()
-		if (sp_scores[0] >= sp_playto || sp_scores[1] >= sp_playto &&
-		    sp_scores[0]              != sp_scores[1]) {
+		if ((sp_scores[0] >= sp_playto || sp_scores[1] >= sp_playto) &&
+		    (sp_scores[0]              != sp_scores[1])) {
 			sp_say("Game over!")
 			winner = sp_scores[0] > sp_scores[1] ? 0 : 1
 			looser = !winner
