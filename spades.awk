@@ -164,7 +164,7 @@ function sp_say(msg)
 {
 	say(sp_channel, msg)
 	print msg |& sp_sock
-	print strftime("%Y-%m-%d %H:%M:%S | ") msg >> "logs/" sp_log
+	print strftime("%Y-%m-%d %H:%M:%S | ") sp_ugly(msg) >> "logs/" sp_log
 	fflush("logs/" sp_log)
 }
 
@@ -180,6 +180,16 @@ function sp_pretty(cards, who)
 		gsub(/d/, "\002♦", cards)
 		gsub(/c/, "\002♣", cards)
 	}
+	return cards
+}
+
+function sp_ugly(cards, who)
+{
+	gsub(/[\2\17]|\3[14],00|/, "", cards)
+	gsub(/♠/, "s", cards)
+	gsub(/♥/, "h", cards)
+	gsub(/♦/, "d", cards)
+	gsub(/♣/, "c", cards)
 	return cards
 }
 
