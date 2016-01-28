@@ -393,7 +393,7 @@ function sp_play(card,	winner, pi)
 		} else {
 			if (sp_scores[0] == sp_scores[1] &&
 			    sp_scores[0] >= sp_playto)
-				sp_say("It's tie! Playing an extra round!");
+				sp_say("It's a tie! Playing an extra round!");
 			sp_reset(1)
 			sp_deal()
 		}
