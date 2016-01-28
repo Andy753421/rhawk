@@ -529,7 +529,7 @@ AUTH == OWNER &&
 }
 
 /^\.help game$/ {
-	say(".newgame [score] -- start a game to <score> points, default 500")
+	say(".newgame [score] -- start a game to <score> points, default 300")
 	say(".endgame -- abort the current game")
 	say(".savegame -- save the current game to disk")
 	say(".loadgame -- load the previously saved game")
@@ -600,7 +600,7 @@ match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 	} else {
 		$1         = ".join"
 		sp_owner   = FROM
-		sp_playto  = $2 ? $2 : 200
+		sp_playto  = $2 ? $2 : 300
 		sp_limit   = sp_playto > 200 ? 10 : 5;
 		sp_state   = "join"
 		sp_channel = DST
