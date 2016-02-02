@@ -619,12 +619,25 @@ match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 	}
 }
 
-(sp_from == sp_owner || AUTH == OWNER) &&
-/^\.endgame$/ {
+/^\.(endgame|fliptable)$/ {
 	if (sp_state == "new") {
 		reply("There is no game in progress.")
-	} else {
+	}
+	else if (!(sp_from in sp_players)) {
+		reply("You are not playing")
+	}
+	else if (sp_state == "join") {
 		sp_say(FROM " ends the game")
+		sp_reset(2)
+	}
+	else {
+		_looser = (sp_players[sp_from]+0) % 2;
+		_winner = (sp_players[sp_from]+1) % 2;
+		sp_say(FROM " goes on a rampage")
+		say(CHANNEL, sp_team(_winner) " wins the game " \
+		    sp_scores[_winner] " to " sp_scores[_looser])
+		say(CHANNEL, sp_order[_winner+0] "++")
+		say(CHANNEL, sp_order[_winner+2] "++")
 		sp_reset(2)
 	}
 }
@@ -648,6 +661,8 @@ match($0, /^\.newgame ?([1-9][0-9]*) *- *([1-9][0-9]*)$/, _arr) {
 		sp_say(FROM " joins the game!")
 	}
 	if (sp_state == "join" && sp_turn == 0) {
+		sp_scores[0] = 0
+		sp_scores[1] = 0
 		sp_shuf()
 		sp_deal()
 	}
