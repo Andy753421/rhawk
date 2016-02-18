@@ -1022,6 +1022,6 @@ sp_state == "play" &&
 	sp_stats("logs/" $2 ".log");
 }
 
-/^\.((new|end|load)game|join|look|bid|pass|play|allow|deny|team|notify)/ {
+/^\.((new|end|load)game|fliptable|join|look|bid|pass|play|allow|deny|team|notify)/ {
 	sp_save("var/sp_cur.json");
 }
